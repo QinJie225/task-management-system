@@ -37,7 +37,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{taskId}")
-    public ResponseEntity<TaskResponse> updateTask(@PathVariable String taskId, @RequestBody UpdateTaskRequest updateTaskRequest) {
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable String taskId, @Valid @RequestBody UpdateTaskRequest updateTaskRequest) {
         TaskResponse response = taskService.updateTask(taskId, updateTaskRequest);
         log.info("Task with taskId {} and title {} was updated successfully", response.taskId(), response.title());
         return ResponseEntity.ok(response);

@@ -1,5 +1,6 @@
 package org.example.internshipassignmentkafka.dtos;
 
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.example.internshipassignmentkafka.enums.TaskPriority;
@@ -17,5 +18,6 @@ public record UpdateTaskRequest(
         String description,
         TaskStatus status,
         TaskPriority priority,
+        @FutureOrPresent(message = ValidationMessages.DUE_DATE_FUTURE_OR_PRESENT)
         LocalDate dueDate
 ) { }
