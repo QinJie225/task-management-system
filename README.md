@@ -27,9 +27,17 @@ A RESTful Task Management System built with Spring Boot, Apache Kafka, and Mongo
 
 4. Start a MongoDB instance (default connection is expected on `localhost:27017`)
 
-5. Start Zookeeper in command prompt 
+5. Start Zookeeper in command prompt
+
+```bash
+C:\kafka\kafka_2.12-3.5.2\bin\windows\zookeeper-server-start.bat C:\kafka\kafka_2.12-3.5.2\config\zookeeper.properties
+```
 
 6. Start Apache Kafka (default connection is expected on `localhost:9092`) in command prompt
+
+```bash
+C:\kafka\kafka_2.12-3.5.2\bin\windows\kafka-server-start.bat C:\kafka\kafka_2.12-3.5.2\config\server.properties
+```
 
 7. Configure database and Kafka by editing `src/main/resources/application.properties` 
 
@@ -55,11 +63,7 @@ A RESTful Task Management System built with Spring Boot, Apache Kafka, and Mongo
    spring.kafka.consumer.properties.spring.json.value.default.type=org.example.internshipassignmentkafka.kafka.TaskEvent
    spring.kafka.producer.properties.spring.json.add.type.headers=false
    ```
-7. Run the application
-
-   ```bash
-   mvn spring-boot:run
-   ```
+7. Run the application by clicking the **Run** button on `InternshipAssignmentKafkaApplication.java`.
 
 ## Usage Example
 1. Run `src/main/java/org/example/internshipassignmentkafka/InternshipAssignmentKafkaApplication.java` to start the application
