@@ -149,4 +149,23 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(response);
     }
+
+    @ExceptionHandler(KafkaPublishFailedException.class)
+    public ResponseEntity<ApiErrorResponse> handleKafkaPublishFailed(
+            KafkaPublishFailedException ex,
+            HttpServletRequest request
+    ) {
+        log.error("Kafka publish failure: {}", ex.getMessage());
+
+        ApiErrorResponse response = new ApiErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
 }

@@ -2,6 +2,7 @@ package org.example.internshipassignmentkafka.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.internshipassignmentkafka.exception.KafkaPublishFailedException;
 import org.example.internshipassignmentkafka.model.Task;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,15 @@ public class TaskEventProducer {
                 task.getTitle(),
                 LocalDateTime.now()
         );
-        kafkaTemplate.send(TOPIC, event);
-        log.info("Published Kafka Event: {} for {}", eventType, task.getId());
+        try {
+            var result = kafkaTemplate.send(TOPIC, event).join();
+            log.info("Published Kafka Event: {} for {} — offset: {}",
+                    eventType, task.getId(),
+                    result.getRecordMetadata().offset());
+        } catch (Exception ex) {
+            log.error("Failed to publish Kafka Event: {} for {} — {}",
+                    eventType, task.getId(), ex.getMessage());
+            throw new KafkaPublishFailedException(eventType, task.getId(), ex);
+        }
     }
 }
