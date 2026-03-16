@@ -27,13 +27,13 @@ A RESTful Task Management System built with Spring Boot, Apache Kafka, and Mongo
 
 4. Start a MongoDB instance (default connection is expected on `localhost:27017`)
 
-5. Start Zookeeper in command prompt
+5. Start Zookeeper in command prompt (Run as Administrator)
 
 ```bash
 C:\kafka\kafka_2.12-3.5.2\bin\windows\zookeeper-server-start.bat C:\kafka\kafka_2.12-3.5.2\config\zookeeper.properties
 ```
 
-6. Start Apache Kafka (default connection is expected on `localhost:9092`) in command prompt
+6. Start Apache Kafka in Command Prompt (Run as Administrator). The default broker connection is expected on `localhost:9092`.
 
 ```bash
 C:\kafka\kafka_2.12-3.5.2\bin\windows\kafka-server-start.bat C:\kafka\kafka_2.12-3.5.2\config\server.properties
@@ -63,13 +63,17 @@ C:\kafka\kafka_2.12-3.5.2\bin\windows\kafka-server-start.bat C:\kafka\kafka_2.12
    spring.kafka.consumer.properties.spring.json.value.default.type=org.example.internshipassignmentkafka.kafka.TaskEvent
    spring.kafka.producer.properties.spring.json.add.type.headers=false
    ```
-7. Run the application by clicking the **Run** button on `InternshipAssignmentKafkaApplication.java`.
+8. Run the application by clicking the **Run** button on `InternshipAssignmentKafkaApplication.java`
 
 ## Usage Example
 1. Run `src/main/java/org/example/internshipassignmentkafka/InternshipAssignmentKafkaApplication.java` to start the application
 2. Test the API endpoints using Postman
-3. Monitor Kafka events through application logs
+3. Monitor Kafka events in the application logs displayed in the terminal or command prompt (Run as Administrator)
 
+```bash
+cd C:\kafka\kafka_2.12-3.5.2
+bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic task-events --from-beginning
+````
 
 ## API Endpoints
 ### Tasks
