@@ -1,0 +1,441 @@
+{
+  "info": {
+    "_postman_id": "162b5d28-6aa5-426c-8e1c-70becbd868bd",
+    "name": "Internship-Assignment-Kafka",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52609338",
+    "_collection_link": "https://go.postman.co/collection/52609338-162b5d28-6aa5-426c-8e1c-70becbd868bd?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "POST Create Task",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task 2",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-03-22\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task 2 with DueDate Before Present",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-03-01\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task with Invalid Task Priority Enum",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"MEDIUM HIGH\",\r\n  \"dueDate\": \"2026-03-22\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task with Null Description",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"priority\": \"MEDIUM\",\r\n  \"dueDate\": \"2026-03-22\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task with Exceed 40 Characters Title",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Implement the producer and consumer logic for the internship task\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-03-22\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET All Tasks",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET All Tasks Copy with PENDING Status",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}?status=PENDING",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "PENDING"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET All Tasks with Invalid Task Status Enum",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}?status=SUBMITTED",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "SUBMITTED"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Single Task",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE Task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"COMPLETED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task-001 Due Date",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"dueDate\": \"2026-03-30\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task-001 Due Date to Yesterday",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"dueDate\": \"2026-03-14\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task Status on Task-003 (Not Found)",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"COMPLETED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET All Tasks Copy with COMPLETED Status",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}?status=COMPLETED",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "COMPLETED"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task with Null RequestBody",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task Status with Invalid Enum",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"SUBMITTED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
