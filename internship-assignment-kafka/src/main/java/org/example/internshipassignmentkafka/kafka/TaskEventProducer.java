@@ -20,19 +20,19 @@ public class TaskEventProducer {
     public void publishEvent(String eventType, Task task) {
         TaskEvent event = new TaskEvent(
                 eventType,
-                task.getId(),
+                task.getTaskId(),
                 task.getTitle(),
                 LocalDateTime.now()
         );
         try {
             var result = kafkaTemplate.send(TOPIC, event).join();
             log.info("Published Kafka Event: {} for {} — offset: {}",
-                    eventType, task.getId(),
+                    eventType, task.getTaskId(),
                     result.getRecordMetadata().offset());
         } catch (Exception ex) {
             log.error("Failed to publish Kafka Event: {} for {} — {}",
-                    eventType, task.getId(), ex.getMessage());
-            throw new KafkaPublishFailedException(eventType, task.getId(), ex);
+                    eventType, task.getTaskId(), ex.getMessage());
+            throw new KafkaPublishFailedException(eventType, task.getTaskId(), ex);
         }
     }
 }
