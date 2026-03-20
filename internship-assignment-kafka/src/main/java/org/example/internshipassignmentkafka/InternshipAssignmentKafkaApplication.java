@@ -11,6 +11,7 @@ import java.util.TimeZone;
 public class InternshipAssignmentKafkaApplication {
 
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kuala_Lumpur"));
         SpringApplication.run(InternshipAssignmentKafkaApplication.class, args);
     }
 

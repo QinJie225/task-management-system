@@ -25,14 +25,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponse createTask(CreateTaskRequest createTaskRequest) {
-
         Task task = taskMapper.toEntity(createTaskRequest);
-
         task.setStatus(TaskStatus.PENDING);
         Task savedTask = taskRepository.save(task);
-
-        taskEventProducer.publishEvent("TASK_CREATED", savedTask);
-
         return taskMapper.toDto(savedTask);
     }
 
@@ -64,8 +59,6 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByTaskId(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(taskId));
         taskRepository.delete(task);
-
-        taskEventProducer.publishEvent("TASK_DELETED", task);
     }
 
     @Override
@@ -80,8 +73,6 @@ public class TaskServiceImpl implements TaskService {
 
         taskMapper.updateTask(updateTaskRequest, task);
         Task updatedTask = taskRepository.save(task);
-
-        taskEventProducer.publishEvent("TASK_UPDATED", updatedTask);
 
         return taskMapper.toDto(updatedTask);
     }

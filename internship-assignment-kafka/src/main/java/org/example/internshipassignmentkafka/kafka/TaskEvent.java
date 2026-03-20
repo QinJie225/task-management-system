@@ -13,8 +13,9 @@ import java.time.LocalDateTime;
 public class TaskEvent {
 
     private String eventType;
-    private String taskId;
-    private String title;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
+
+    private Object payload;
 }

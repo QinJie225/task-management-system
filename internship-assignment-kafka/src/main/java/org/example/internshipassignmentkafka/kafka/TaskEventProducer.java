@@ -2,6 +2,8 @@ package org.example.internshipassignmentkafka.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.internshipassignmentkafka.dtos.CreateTaskRequest;
+import org.example.internshipassignmentkafka.dtos.UpdateTaskRequest;
 import org.example.internshipassignmentkafka.exception.KafkaPublishFailedException;
 import org.example.internshipassignmentkafka.model.Task;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,24 +17,32 @@ import java.time.LocalDateTime;
 public class TaskEventProducer {
 
     private final KafkaTemplate<String, TaskEvent> kafkaTemplate;
-    private static final String TOPIC = "task-events";
+    private static final String TOPIC_CREATED = "task-created-events";
+    private static final String TOPIC_UPDATED = "task-updated-events";
+    private static final String TOPIC_DELETED = "task-deleted-events";
 
-    public void publishEvent(String eventType, Task task) {
-        TaskEvent event = new TaskEvent(
-                eventType,
-                task.getTaskId(),
-                task.getTitle(),
-                LocalDateTime.now()
-        );
+    public void publishCreateEvent(CreateTaskRequest request) {
+        send(TOPIC_CREATED, new TaskEvent("TASK_CREATED", LocalDateTime.now(), request));
+    }
+
+    public void publishUpdateEvent(String taskId, UpdateTaskRequest request) {
+        send(TOPIC_UPDATED, new TaskEvent("TASK_UPDATED", LocalDateTime.now(), new TaskUpdatedPayload(taskId, request)));
+    }
+
+    public void publishDeleteEvent(String taskId) {
+        send(TOPIC_DELETED, new TaskEvent("TASK_DELETED", LocalDateTime.now(), taskId));
+    }
+
+    public void send(String topic, TaskEvent event) {
         try {
-            var result = kafkaTemplate.send(TOPIC, event).join();
-            log.info("Published Kafka Event: {} for {} — offset: {}",
-                    eventType, task.getTaskId(),
+            var result = kafkaTemplate.send(topic, event).join();
+            log.info("Published Kafka Event: {} — offset: {}",
+                    event.getEventType(),
                     result.getRecordMetadata().offset());
         } catch (Exception ex) {
-            log.error("Failed to publish Kafka Event: {} for {} — {}",
-                    eventType, task.getTaskId(), ex.getMessage());
-            throw new KafkaPublishFailedException(eventType, task.getTaskId(), ex);
+            log.error("Failed to publish Kafka Event: {} — {}",
+                    event.getEventType(), ex.getMessage());
+            throw new KafkaPublishFailedException(event.getEventType(), null, ex);
         }
     }
 }
