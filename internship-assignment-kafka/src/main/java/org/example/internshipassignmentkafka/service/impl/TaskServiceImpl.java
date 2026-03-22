@@ -7,7 +7,6 @@ import org.example.internshipassignmentkafka.dtos.UpdateTaskRequest;
 import org.example.internshipassignmentkafka.enums.TaskStatus;
 import org.example.internshipassignmentkafka.exception.EmptyUpdateRequestException;
 import org.example.internshipassignmentkafka.exception.TaskNotFoundException;
-import org.example.internshipassignmentkafka.kafka.TaskEventProducer;
 import org.example.internshipassignmentkafka.mapper.TaskMapper;
 import org.example.internshipassignmentkafka.model.Task;
 import org.example.internshipassignmentkafka.repository.TaskRepository;
@@ -21,7 +20,6 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
-    private final TaskEventProducer taskEventProducer;
 
     @Override
     public TaskResponse createTask(CreateTaskRequest createTaskRequest, String taskId) {

@@ -43,7 +43,6 @@ public class TaskController {
     public ResponseEntity<List<TaskResponse>> getAllTasks(
             @RequestParam(required = false)TaskStatus status
             ) {
-
         if (status != null) {
             return ResponseEntity.ok(taskService.getTasksByStatus(status));
         }

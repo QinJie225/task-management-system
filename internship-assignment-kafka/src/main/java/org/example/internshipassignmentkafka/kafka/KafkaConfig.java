@@ -14,7 +14,7 @@ public class KafkaConfig {
     @Bean
     public NewTopic taskEventsTopic() {
         return TopicBuilder.name("task-events")
-                .partitions(1)
+                .partitions(3)
                 .replicas(1)
                 .build();
     }

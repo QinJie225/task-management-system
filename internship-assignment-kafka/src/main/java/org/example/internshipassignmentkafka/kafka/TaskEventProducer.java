@@ -19,9 +19,7 @@ public class TaskEventProducer {
     private final KafkaTemplate<String, TaskEvent> kafkaTemplate;
     private final SequenceGeneratorService sequenceGeneratorService;
 
-    private static final String TOPIC_CREATED = "task-created-events";
-    private static final String TOPIC_UPDATED = "task-updated-events";
-    private static final String TOPIC_DELETED = "task-deleted-events";
+    private static final String TOPIC = "task-events";
 
     public void publishCreateEvent(CreateTaskRequest request) {
         long nextId = sequenceGeneratorService.generateSequence("task_sequence");
@@ -29,7 +27,7 @@ public class TaskEventProducer {
         CreateTaskPayload payload = new CreateTaskPayload(taskId, request);
         TaskEvent event = new TaskEvent("TASK_CREATED", LocalDateTime.now(), payload);
 
-        send(TOPIC_CREATED, taskId, event);
+        send(taskId, event);
     }
 
     public void publishUpdateEvent(String taskId, UpdateTaskRequest request) {
@@ -37,16 +35,16 @@ public class TaskEventProducer {
         TaskEvent event = new TaskEvent("TASK_UPDATED", LocalDateTime.now(), payload);
 
 
-        send(TOPIC_UPDATED, taskId, event);
+        send(taskId, event);
     }
 
     public void publishDeleteEvent(String taskId) {
         TaskEvent event = new TaskEvent("TASK_DELETED", LocalDateTime.now(), taskId);
-        send(TOPIC_DELETED, taskId, event);
+        send(taskId, event);
     }
 
-    private void send(String topic, String key, TaskEvent event) {
-        kafkaTemplate.send(topic, key, event)
+    private void send(String key, TaskEvent event) {
+        kafkaTemplate.send(TOPIC, key, event)
                 .whenComplete((result, ex) -> {
                     if (ex != null) {
                         log.error("Failed to publish Kafka Event: {} - {}",
