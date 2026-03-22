@@ -24,11 +24,11 @@ public class TaskServiceImpl implements TaskService {
     private final TaskEventProducer taskEventProducer;
 
     @Override
-    public TaskResponse createTask(CreateTaskRequest createTaskRequest) {
+    public TaskResponse createTask(CreateTaskRequest createTaskRequest, String taskId) {
         Task task = taskMapper.toEntity(createTaskRequest);
+        task.setTaskId(taskId);
         task.setStatus(TaskStatus.PENDING);
-        Task savedTask = taskRepository.save(task);
-        return taskMapper.toDto(savedTask);
+        return taskMapper.toDto(taskRepository.save(task));
     }
 
     @Override
@@ -77,11 +77,17 @@ public class TaskServiceImpl implements TaskService {
         return taskMapper.toDto(updatedTask);
     }
 
+
     private boolean isEmptyUpdate(UpdateTaskRequest request) {
         return request.title() == null &&
                 request.description() == null &&
                 request.status() == null &&
                 request.priority() == null &&
                 request.dueDate() == null;
+    }
+
+    @Override
+    public boolean exists(String taskId) {
+        return taskRepository.findByTaskId(taskId).isPresent();
     }
 }

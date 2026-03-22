@@ -2,7 +2,6 @@ package org.example.internshipassignmentkafka.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.internshipassignmentkafka.dtos.CreateTaskRequest;
 import org.example.internshipassignmentkafka.exception.KafkaConsumeFailedException;
 import org.example.internshipassignmentkafka.service.TaskService;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -19,9 +18,15 @@ public class TaskEventConsumer {
     @KafkaListener(topics = "task-created-events", groupId = "task-group")
     public void consumeCreated(TaskEvent event) {
         log.info("Received Kafka Event: {}", event.getEventType());
+
         try {
-            CreateTaskRequest request = objectMapper.convertValue(event.getPayload(), CreateTaskRequest.class);
-            taskService.createTask(request);
+            CreateTaskPayload payload = objectMapper.convertValue(event.getPayload(), CreateTaskPayload.class);
+
+            if (taskService.exists(payload.taskId())) {
+                log.info("Task {} already exists, skipping duplicate", payload.taskId());
+                return;
+            }
+            taskService.createTask(payload.request(), payload.taskId());
         } catch (Exception ex) {
             log.error("Failed to process TASK_CREATED Event: {} — {}", event.getEventType(), ex.getMessage(), ex);
             throw new KafkaConsumeFailedException(event.getEventType(), null, ex);
@@ -31,6 +36,7 @@ public class TaskEventConsumer {
     @KafkaListener(topics = "task-updated-events", groupId = "task-group")
     public void consumeUpdated(TaskEvent event) {
         log.info("Received Kafka Event: {}", event.getEventType());
+
         try {
             TaskUpdatedPayload payload = objectMapper.convertValue(event.getPayload(), TaskUpdatedPayload.class);
             taskService.updateTask(payload.taskId(), payload.request());
@@ -43,6 +49,7 @@ public class TaskEventConsumer {
     @KafkaListener(topics = "task-deleted-events", groupId = "task-group")
     public void consumeDeleted(TaskEvent event) {
         log.info("Received Kafka Event: {}", event.getEventType());
+
         try {
             String taskId = objectMapper.convertValue(event.getPayload(), String.class);
             taskService.deleteTask(taskId);
@@ -51,6 +58,4 @@ public class TaskEventConsumer {
             throw new KafkaConsumeFailedException(event.getEventType(), null, ex);
         }
     }
-
-
 }

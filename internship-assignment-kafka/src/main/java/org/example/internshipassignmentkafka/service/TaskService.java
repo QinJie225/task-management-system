@@ -8,10 +8,12 @@ import org.example.internshipassignmentkafka.enums.TaskStatus;
 import java.util.List;
 
 public interface TaskService {
-    TaskResponse createTask(CreateTaskRequest createTaskRequest);
+    TaskResponse createTask(CreateTaskRequest createTaskRequest, String taskId);
     List<TaskResponse> getAllTasks();
     TaskResponse getTasks(String taskId);
     void deleteTask(String taskId);
     TaskResponse updateTask(String taskId, UpdateTaskRequest updateTaskRequest);
     List<TaskResponse> getTasksByStatus(TaskStatus status);
+
+    boolean exists(String taskId);
 }
