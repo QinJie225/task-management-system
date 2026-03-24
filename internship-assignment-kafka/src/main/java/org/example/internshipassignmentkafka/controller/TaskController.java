@@ -7,58 +7,67 @@ import org.example.internshipassignmentkafka.dtos.CreateTaskRequest;
 import org.example.internshipassignmentkafka.dtos.TaskResponse;
 import org.example.internshipassignmentkafka.dtos.UpdateTaskRequest;
 import org.example.internshipassignmentkafka.enums.TaskStatus;
+import org.example.internshipassignmentkafka.exception.EmptyUpdateRequestException;
 import org.example.internshipassignmentkafka.kafka.TaskEventProducer;
 import org.example.internshipassignmentkafka.service.TaskService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
+
     private final TaskEventProducer taskEventProducer;
     private final TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<Void> createTask(
-            @Valid @RequestBody CreateTaskRequest createTaskRequest
-            ) {
-        taskEventProducer.publishCreateEvent(createTaskRequest);
-        log.info("Published TASK_CREATED event for title={}", createTaskRequest.title());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Mono<Void> createTask(@Valid @RequestBody CreateTaskRequest createTaskRequest) {
+        return Mono.defer(() -> taskEventProducer.publishCreateEvent(createTaskRequest))
+                .doOnSuccess(v -> log.info("Published TASK_CREATED event for title={}", createTaskRequest.title()))
+                .then();
     }
 
     @PatchMapping("/{taskId}")
-    public ResponseEntity<Void> updateTask(@PathVariable String taskId, @Valid @RequestBody UpdateTaskRequest updateTaskRequest) {
-        taskEventProducer.publishUpdateEvent(taskId, updateTaskRequest);
-        log.info("Published TASK_UPDATED event for taskId={}", taskId);
-        return ResponseEntity.accepted().build();
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Mono<Void> updateTask(
+            @PathVariable String taskId,
+            @Valid @RequestBody UpdateTaskRequest updateTaskRequest) {
+
+        if (taskService.isEmptyUpdate(updateTaskRequest)) {
+            return Mono.error(new EmptyUpdateRequestException());
+        }
+
+        return Mono.defer(() ->
+                        taskEventProducer.publishUpdateEvent(taskId, updateTaskRequest)
+                )
+                .doOnSuccess(v -> log.info("Published TASK_UPDATED event for taskId={}", taskId))
+                .then();
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> getAllTasks(
-            @RequestParam(required = false)TaskStatus status
-            ) {
+    public Flux<TaskResponse> getAllTasks(@RequestParam(required = false) TaskStatus status) {
         if (status != null) {
-            return ResponseEntity.ok(taskService.getTasksByStatus(status));
+            return taskService.getTasksByStatus(status);
         }
-
-        return ResponseEntity.ok(taskService.getAllTasks());
+        return taskService.getAllTasks();
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<TaskResponse> getTasks(@PathVariable String taskId){
-        return ResponseEntity.ok(taskService.getTasks(taskId));
+    public Mono<TaskResponse> getTask(@PathVariable String taskId) {
+        return taskService.getTask(taskId);
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable String taskId) {
-        taskEventProducer.publishDeleteEvent(taskId);
-        log.info("Published TASK_DELETED event for taskId={}", taskId);
-        return ResponseEntity.accepted().build();
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Mono<Void> deleteTask(@PathVariable String taskId) {
+        return Mono.defer(() -> taskEventProducer.publishDeleteEvent(taskId))
+                .doOnSuccess(v -> log.info("Published TASK_DELETED event for taskId={}", taskId))
+                .then();
     }
 }

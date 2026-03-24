@@ -1,5 +1,6 @@
 package org.example.internshipassignmentkafka.kafka;
 
+import reactor.core.publisher.Mono;
 import tools.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,40 +21,51 @@ public class TaskEventConsumer {
     public void consume(TaskEvent event) {
         log.info("Received Kafka Event: {}", event.getEventType());
 
-        try {
-            switch (event.getEventType()) {
+        buildReactiveChain(event)
+                .doOnError(ex -> log.error("Failed to process {} Event: {}",
+                        event.getEventType(), ex.getMessage(), ex))
+                .onErrorMap(ex -> new KafkaConsumeFailedException(event.getEventType(), null, ex))
+                .block();
+    }
 
-                case "TASK_CREATED" -> {
-                    CreateTaskPayload payload = objectMapper.convertValue(
-                            event.getPayload(), CreateTaskPayload.class
-                    );
+    private Mono<Void> buildReactiveChain(TaskEvent event) {
+        return switch (event.getEventType()) {
 
-                    if (taskService.exists(payload.taskId())) {
-                        log.info("Task {} already exists, skipping duplicate", payload.taskId());
-                        return;
-                    }
-                    taskService.createTask(payload.request(), payload.taskId());
-                }
+            case "TASK_CREATED" -> {
+                CreateTaskPayload payload = objectMapper.convertValue(
+                        event.getPayload(), CreateTaskPayload.class);
 
-                case "TASK_UPDATED" -> {
-                    TaskUpdatedPayload payload = objectMapper.convertValue(
-                            event.getPayload(), TaskUpdatedPayload.class
-                    );
-                    taskService.updateTask(payload.taskId(), payload.request());
-                }
-
-                case "TASK_DELETED" -> {
-                    String taskId = objectMapper.convertValue(event.getPayload(), String.class);
-                    taskService.deleteTask(taskId);
-                }
-
-                default -> log.warn("Unknown event type: {}", event.getEventType());
+                yield taskService.exists(payload.taskId())
+                        .flatMap(exists -> {
+                            if (exists) {
+                                log.info("Task {} already exists, skipping", payload.taskId());
+                                return Mono.empty();
+                            }
+                            return taskService.createTask(payload.request(), payload.taskId())
+                                    .then();
+                        });
             }
 
-        } catch (Exception ex) {
-            log.error("Failed to process {} Event: {}",
-                    event.getEventType(), ex.getMessage(), ex);
-            throw new KafkaConsumeFailedException(event.getEventType(), null, ex);
-        }
+            case "TASK_UPDATED" -> {
+                TaskUpdatedPayload payload = objectMapper.convertValue(
+                        event.getPayload(), TaskUpdatedPayload.class);
+                yield taskService.updateTask(payload.taskId(), payload.request())
+                        .doOnError(ex -> log.error("Unexpected error updating task {}: {}",
+                                payload.taskId(), ex.getMessage()))
+                        .then();
+            }
+
+            case "TASK_DELETED" -> {
+                String taskId = objectMapper.convertValue(event.getPayload(), String.class);
+                yield taskService.deleteTask(taskId)
+                        .doOnError(ex -> log.error("Unexpected error deleting task {}: {}",
+                        taskId, ex.getMessage()));
+            }
+
+            default -> {
+                log.warn("Unknown event type: {}", event.getEventType());
+                yield Mono.empty();
+            }
+        };
     }
 }

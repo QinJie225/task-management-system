@@ -1,15 +1,15 @@
 package org.example.internshipassignmentkafka.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import tools.jackson.databind.exc.InvalidFormatException;
+import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -20,28 +20,30 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({
-            TaskNotFoundException.class
-    })
-    public ResponseEntity<ApiErrorResponse> handleNotFoundRequest(
-            RuntimeException ex,
-            HttpServletRequest request
+    @ExceptionHandler(TaskNotFoundException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleNotFound(
+            TaskNotFoundException ex,
+            ServerHttpRequest request
     ) {
         log.warn("{}", ex.getMessage());
-        ApiErrorResponse errorResponse = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Not Found",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        "Not Found",
+                        ex.getMessage(),
+                        request.getPath().value(),
+                        null
+                )));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    // WebFlux equivalent of MethodArgumentNotValidException
+    @ExceptionHandler(WebExchangeBindException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleValidation(
+            WebExchangeBindException ex,
+            ServerHttpRequest request
+    ) {
         List<FieldErrorDto> fieldErrors = ex.getFieldErrors()
                 .stream()
                 .map(fe -> new FieldErrorDto(fe.getField(), fe.getDefaultMessage()))
@@ -49,123 +51,114 @@ public class GlobalExceptionHandler {
 
         log.warn(
                 "Validation failed. Endpoint: {}, Method: {}, Errors: {}",
-                request.getRequestURI(),
+                request.getPath().value(),
                 request.getMethod(),
                 fieldErrors
         );
 
-        ApiErrorResponse errorResponse = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Failed",
-                "Request contains invalid fields",
-                request.getRequestURI(),
-                fieldErrors
-        );
-
-        return ResponseEntity.badRequest().body(errorResponse);
+        return Mono.just(ResponseEntity
+                .badRequest()
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Validation Failed",
+                        "Request contains invalid fields",
+                        request.getPath().value(),
+                        fieldErrors
+                )));
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiErrorResponse> handleInvalidEnum(
-            HttpMessageNotReadableException ex,
-            HttpServletRequest request
+    // WebFlux equivalent of HttpMessageNotReadableException
+    @ExceptionHandler(ServerWebInputException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleInvalidInput(
+            ServerWebInputException ex,
+            ServerHttpRequest request
     ) {
-        String message = "Invalid request format";
-
-        if (ex.getCause() instanceof InvalidFormatException invalidFormatException) {
-
-            Class<?> targetType = invalidFormatException.getTargetType();
-
-            if (targetType.isEnum()) {
-
-                String allowedValues = Arrays.stream(targetType.getEnumConstants())
-                        .map(Object::toString)
-                        .collect(Collectors.joining(", "));
-
-                message = "Invalid value. Allowed values: " + allowedValues;
-            }
-        }
-
+        String message = buildMessage(ex);
         log.warn("Invalid request body: {}", ex.getMessage());
-
-        ApiErrorResponse response = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                message,
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.badRequest().body(response);
+        return Mono.just(ResponseEntity
+                .badRequest()
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Bad Request",
+                        message,
+                        request.getPath().value(),
+                        null
+                )));
     }
 
-    @ExceptionHandler({
-            EmptyUpdateRequestException.class
-    })
-    public ResponseEntity<ApiErrorResponse> handleBadRequest(
-            RuntimeException ex,
-            HttpServletRequest request
+    private String buildMessage(Throwable ex) {
+        Throwable t = ex;
+        while (t != null) {
+            if (t.getClass().getName().endsWith("InvalidFormatException")) {
+                Class<?> targetType = extractTargetType(t);
+                if (targetType != null && targetType.isEnum()) {
+                    String allowedValues = Arrays.stream(targetType.getEnumConstants())
+                            .map(Object::toString)
+                            .collect(Collectors.joining(", "));
+                    return "Invalid value. Allowed values: " + allowedValues;
+                }
+            }
+            if (t instanceof TypeMismatchException tme) {
+                Class<?> targetType = tme.getRequiredType();
+                if (targetType != null && targetType.isEnum()) {
+                    return buildEnumErrorMessage(targetType);
+                }
+            }
+            t = t.getCause();
+        }
+        return "Invalid request format";
+    }
+
+    private String buildEnumErrorMessage(Class<?> enumType) {
+        String allowedValues = Arrays.stream(enumType.getEnumConstants())
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
+        return "Invalid value. Allowed values: " + allowedValues;
+    }
+
+    private Class<?> extractTargetType(Throwable t) {
+        try {
+            return (Class<?>) t.getClass().getMethod("getTargetType").invoke(t);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @ExceptionHandler(EmptyUpdateRequestException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleBadRequest(
+            EmptyUpdateRequestException ex,
+            ServerHttpRequest request
     ) {
         log.warn("{}", ex.getMessage());
-
-        ApiErrorResponse response = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
-
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiErrorResponse> handleMethodArgumentTypeMismatch(
-            MethodArgumentTypeMismatchException ex,
-            HttpServletRequest request
-    ) {
-        String message = "Invalid parameter value: '" + ex.getValue() + "'";
-
-        if (ex.getRequiredType() != null && ex.getRequiredType().isEnum()) {
-            String allowedValues = Arrays.stream(ex.getRequiredType().getEnumConstants())
-                    .map(Object::toString)
-                    .collect(Collectors.joining(", "));
-            message = "Invalid value '" + ex.getValue() + "'. Allowed values are: " + allowedValues;
-        }
-
-        log.warn("Type mismatch on parameter '{}': {}", ex.getName(), ex.getMessage());
-
-        ApiErrorResponse response = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                message,
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.badRequest().body(response);
+        return Mono.just(ResponseEntity
+                .badRequest()
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Bad Request",
+                        ex.getMessage(),
+                        request.getPath().value(),
+                        null
+                )));
     }
 
     @ExceptionHandler(KafkaPublishFailedException.class)
-    public ResponseEntity<ApiErrorResponse> handleKafkaPublishFailed(
+    public Mono<ResponseEntity<ApiErrorResponse>> handleKafkaPublishFailed(
             KafkaPublishFailedException ex,
-            HttpServletRequest request
+            ServerHttpRequest request
     ) {
         log.error("Kafka publish failure: {}", ex.getMessage());
-
-        ApiErrorResponse response = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Internal Server Error",
+                        ex.getMessage(),
+                        request.getPath().value(),
+                        null
+                )));
     }
 }

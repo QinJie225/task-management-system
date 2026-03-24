@@ -8,6 +8,7 @@ import org.example.internshipassignmentkafka.exception.KafkaPublishFailedExcepti
 import org.example.internshipassignmentkafka.service.SequenceGeneratorService;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
@@ -21,40 +22,37 @@ public class TaskEventProducer {
 
     private static final String TOPIC = "task-events";
 
-    public void publishCreateEvent(CreateTaskRequest request) {
-        long nextId = sequenceGeneratorService.generateSequence("task_sequence");
-        String taskId = String.format("TASK-%03d", nextId);
-        CreateTaskPayload payload = new CreateTaskPayload(taskId, request);
-        TaskEvent event = new TaskEvent("TASK_CREATED", LocalDateTime.now(), payload);
-
-        send(taskId, event);
+    public Mono<Void> publishCreateEvent(CreateTaskRequest request) {
+        return sequenceGeneratorService.generateSequence("task_sequence")
+                .map(nextId -> String.format("TASK-%03d", nextId))
+                .flatMap(taskId -> {
+                    CreateTaskPayload payload = new CreateTaskPayload(taskId, request);
+                    TaskEvent event = new TaskEvent("TASK_CREATED", LocalDateTime.now(), payload);
+                    return send(taskId, event);
+                });
     }
 
-    public void publishUpdateEvent(String taskId, UpdateTaskRequest request) {
+    public Mono<Void> publishUpdateEvent(String taskId, UpdateTaskRequest request) {
         TaskUpdatedPayload payload = new TaskUpdatedPayload(taskId, request);
         TaskEvent event = new TaskEvent("TASK_UPDATED", LocalDateTime.now(), payload);
-
-
-        send(taskId, event);
+        return send(taskId, event);
     }
 
-    public void publishDeleteEvent(String taskId) {
+    public Mono<Void> publishDeleteEvent(String taskId) {
         TaskEvent event = new TaskEvent("TASK_DELETED", LocalDateTime.now(), taskId);
-        send(taskId, event);
+        return send(taskId, event);
     }
 
-    private void send(String key, TaskEvent event) {
-        kafkaTemplate.send(TOPIC, key, event)
-                .whenComplete((result, ex) -> {
-                    if (ex != null) {
-                        log.error("Failed to publish Kafka Event: {} - {}",
-                                event.getEventType(), ex.getMessage(), ex);
-                        throw new KafkaPublishFailedException(event.getEventType(), key, ex);
-                    } else {
-                        log.info("Published Kafka Event: {} — offset: {}",
-                                event.getEventType(),
-                                result.getRecordMetadata().offset());
-                    }
-                });
+    private Mono<Void> send(String key, TaskEvent event) {
+        return Mono.fromFuture(
+                        kafkaTemplate.send(TOPIC, key, event).toCompletableFuture()
+                )
+                .doOnSuccess(result -> log.info("Published Kafka Event: {} — offset: {}",
+                        event.getEventType(),
+                        result.getRecordMetadata().offset()))
+                .doOnError(ex -> log.error("Failed to publish Kafka Event: {} - {}",
+                        event.getEventType(), ex.getMessage(), ex))
+                .onErrorMap(ex -> new KafkaPublishFailedException(event.getEventType(), key, ex))
+                .then();
     }
 }
