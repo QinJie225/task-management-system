@@ -39,7 +39,12 @@ public class TaskController {
             @PathVariable String taskId,
             @Valid @RequestBody UpdateTaskRequest updateTaskRequest) {
 
-        if (taskService.isEmptyUpdate(updateTaskRequest)) {
+        if (updateTaskRequest.title() == null &&
+                updateTaskRequest.description() == null &&
+                updateTaskRequest.status() == null &&
+                updateTaskRequest.priority() == null &&
+                updateTaskRequest.dueDate() == null
+        ) {
             return Mono.error(new EmptyUpdateRequestException());
         }
 

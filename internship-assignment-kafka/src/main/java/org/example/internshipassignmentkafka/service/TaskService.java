@@ -14,6 +14,5 @@ public interface TaskService {
     Flux<TaskResponse> getTasksByStatus(TaskStatus status);
     Mono<TaskResponse> updateTask(String taskId, UpdateTaskRequest request);
     Mono<Void> deleteTask(String taskId);
-    Mono<Boolean> exists(String taskId);
-    boolean isEmptyUpdate(UpdateTaskRequest request);
+    Mono<Boolean> existsTaskByTaskId(String taskId);
 }

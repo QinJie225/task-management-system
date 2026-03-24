@@ -88,6 +88,42 @@ public class GlobalExceptionHandler {
                 )));
     }
 
+    @ExceptionHandler(EmptyUpdateRequestException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleBadRequest(
+            EmptyUpdateRequestException ex,
+            ServerHttpRequest request
+    ) {
+        log.warn("{}", ex.getMessage());
+        return Mono.just(ResponseEntity
+                .badRequest()
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Bad Request",
+                        ex.getMessage(),
+                        request.getPath().value(),
+                        null
+                )));
+    }
+
+    @ExceptionHandler(KafkaPublishFailedException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleKafkaPublishFailed(
+            KafkaPublishFailedException ex,
+            ServerHttpRequest request
+    ) {
+        log.error("Kafka publish failure: {}", ex.getMessage());
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Internal Server Error",
+                        ex.getMessage(),
+                        request.getPath().value(),
+                        null
+                )));
+    }
+
     private String buildMessage(Throwable ex) {
         Throwable t = ex;
         while (t != null) {
@@ -124,41 +160,5 @@ public class GlobalExceptionHandler {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    @ExceptionHandler(EmptyUpdateRequestException.class)
-    public Mono<ResponseEntity<ApiErrorResponse>> handleBadRequest(
-            EmptyUpdateRequestException ex,
-            ServerHttpRequest request
-    ) {
-        log.warn("{}", ex.getMessage());
-        return Mono.just(ResponseEntity
-                .badRequest()
-                .body(new ApiErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Bad Request",
-                        ex.getMessage(),
-                        request.getPath().value(),
-                        null
-                )));
-    }
-
-    @ExceptionHandler(KafkaPublishFailedException.class)
-    public Mono<ResponseEntity<ApiErrorResponse>> handleKafkaPublishFailed(
-            KafkaPublishFailedException ex,
-            ServerHttpRequest request
-    ) {
-        log.error("Kafka publish failure: {}", ex.getMessage());
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiErrorResponse(
-                        LocalDateTime.now(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "Internal Server Error",
-                        ex.getMessage(),
-                        request.getPath().value(),
-                        null
-                )));
     }
 }

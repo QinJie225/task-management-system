@@ -67,16 +67,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public boolean isEmptyUpdate(UpdateTaskRequest request) {
-        return request.title() == null &&
-                request.description() == null &&
-                request.status() == null &&
-                request.priority() == null &&
-                request.dueDate() == null;
-    }
-
-    @Override
-    public Mono<Boolean> exists(String taskId) {
+    public Mono<Boolean> existsTaskByTaskId(String taskId) {
         return taskRepository.findByTaskId(taskId)
                 .hasElement();
     }

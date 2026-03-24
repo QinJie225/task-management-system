@@ -35,7 +35,7 @@ public class TaskEventConsumer {
                 CreateTaskPayload payload = objectMapper.convertValue(
                         event.getPayload(), CreateTaskPayload.class);
 
-                yield taskService.exists(payload.taskId())
+                yield taskService.existsTaskByTaskId(payload.taskId())
                         .flatMap(exists -> {
                             if (exists) {
                                 log.info("Task {} already exists, skipping", payload.taskId());
