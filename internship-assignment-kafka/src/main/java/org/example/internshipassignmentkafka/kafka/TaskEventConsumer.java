@@ -37,19 +37,6 @@ public class TaskEventConsumer {
                 CreateTaskPayload payload = objectMapper.convertValue(
                         event.getPayload(), CreateTaskPayload.class);
 
-//                yield taskService.existsTaskByTaskId(payload.taskId())
-//                        .flatMap(exists -> {
-//                            if (exists) {
-//                                log.info("Task {} already exists, skipping", payload.taskId());
-//                                return Mono.empty();
-//                            }
-//                            return taskService.createTask(payload.request(), payload.taskId())
-//                                    .then();
-//                        })
-//                        .then(webhookService.sendCallback("TASK_CREATED", payload.taskId()))
-//                        .onErrorResume(ex -> webhookService.sendFailureCallback(
-//                                "TASK_CREATED", payload.taskId(), ex.getMessage()
-//                        ));
                 yield taskService.createTask(payload.request(), payload.taskId())
                         .then(
                                 webhookService.sendCallback("TASK_CREATED", payload.taskId()))
