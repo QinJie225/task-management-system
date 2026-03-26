@@ -1,8 +1,6 @@
 version: '3.8'
 
 services:
-
-  # ── MongoDB ──────────────────────────────────────────────
   mongo:
     image: mongo:7.0
     container_name: mongo
@@ -18,7 +16,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── Zookeeper (required by Kafka) ────────────────────────
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
@@ -33,7 +30,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── Kafka ─────────────────────────────────────────────────
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
@@ -57,7 +53,6 @@ services:
       timeout: 10s
       retries: 10
 
-  # ── Spring Boot App ───────────────────────────────────────
   app:
     build: .
     container_name: internship-assignment-kafka

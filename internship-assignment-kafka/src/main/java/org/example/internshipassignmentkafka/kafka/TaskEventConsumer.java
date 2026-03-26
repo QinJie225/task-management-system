@@ -1,5 +1,6 @@
 package org.example.internshipassignmentkafka.kafka;
 
+import org.example.internshipassignmentkafka.exception.TaskNotFoundException;
 import reactor.core.publisher.Mono;
 import tools.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class TaskEventConsumer {
 
     private final TaskService taskService;
     private final ObjectMapper objectMapper;
+    private final WebhookService webhookService;
 
     @KafkaListener(topics = "task-events", groupId = "task-group")
     public void consume(TaskEvent event) {
@@ -35,14 +37,25 @@ public class TaskEventConsumer {
                 CreateTaskPayload payload = objectMapper.convertValue(
                         event.getPayload(), CreateTaskPayload.class);
 
-                yield taskService.existsTaskByTaskId(payload.taskId())
-                        .flatMap(exists -> {
-                            if (exists) {
-                                log.info("Task {} already exists, skipping", payload.taskId());
-                                return Mono.empty();
-                            }
-                            return taskService.createTask(payload.request(), payload.taskId())
-                                    .then();
+//                yield taskService.existsTaskByTaskId(payload.taskId())
+//                        .flatMap(exists -> {
+//                            if (exists) {
+//                                log.info("Task {} already exists, skipping", payload.taskId());
+//                                return Mono.empty();
+//                            }
+//                            return taskService.createTask(payload.request(), payload.taskId())
+//                                    .then();
+//                        })
+//                        .then(webhookService.sendCallback("TASK_CREATED", payload.taskId()))
+//                        .onErrorResume(ex -> webhookService.sendFailureCallback(
+//                                "TASK_CREATED", payload.taskId(), ex.getMessage()
+//                        ));
+                yield taskService.createTask(payload.request(), payload.taskId())
+                        .then(
+                                webhookService.sendCallback("TASK_CREATED", payload.taskId()))
+                        .onErrorResume(RuntimeException.class, ex -> {
+                            log.warn(ex.getMessage());
+                            return webhookService.sendFailureCallback("TASK_CREATED", payload.taskId(), ex.getMessage());
                         });
             }
 
@@ -50,16 +63,28 @@ public class TaskEventConsumer {
                 TaskUpdatedPayload payload = objectMapper.convertValue(
                         event.getPayload(), TaskUpdatedPayload.class);
                 yield taskService.updateTask(payload.taskId(), payload.request())
-                        .doOnError(ex -> log.error("Unexpected error updating task {}: {}",
-                                payload.taskId(), ex.getMessage()))
-                        .then();
+                        .then(
+                                webhookService.sendCallback("TASK_UPDATED", payload.taskId())
+                        )
+                        .onErrorResume(RuntimeException.class, ex -> {
+                            log.warn(ex.getMessage());
+                            return webhookService.sendFailureCallback(
+                                    "TASK_UPDATED", payload.taskId(), ex.getMessage()
+                            );
+                        });
             }
 
             case "TASK_DELETED" -> {
                 String taskId = objectMapper.convertValue(event.getPayload(), String.class);
                 yield taskService.deleteTask(taskId)
-                        .doOnError(ex -> log.error("Unexpected error deleting task {}: {}",
-                        taskId, ex.getMessage()));
+                        .then(webhookService.sendCallback("TASK_DELETED", taskId)
+                        )
+                        .onErrorResume(RuntimeException.class, ex -> {
+                            log.warn(ex.getMessage());
+                            return webhookService.sendFailureCallback(
+                                    "TASK_DELETED", taskId, ex.getMessage()
+                            );
+                        });
             }
 
             default -> {

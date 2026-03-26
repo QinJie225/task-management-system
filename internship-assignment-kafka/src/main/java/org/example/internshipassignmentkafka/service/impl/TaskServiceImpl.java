@@ -5,6 +5,7 @@ import org.example.internshipassignmentkafka.dtos.CreateTaskRequest;
 import org.example.internshipassignmentkafka.dtos.TaskResponse;
 import org.example.internshipassignmentkafka.dtos.UpdateTaskRequest;
 import org.example.internshipassignmentkafka.enums.TaskStatus;
+import org.example.internshipassignmentkafka.exception.DuplicateTaskException;
 import org.example.internshipassignmentkafka.exception.TaskNotFoundException;
 import org.example.internshipassignmentkafka.mapper.TaskMapper;
 import org.example.internshipassignmentkafka.model.Task;
@@ -22,10 +23,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Mono<TaskResponse> createTask(CreateTaskRequest createTaskRequest, String taskId) {
-        Task task = taskMapper.toEntity(createTaskRequest);
-        task.setTaskId(taskId);
-        task.setStatus(TaskStatus.PENDING);
-        return taskRepository.save(task)
+        return taskRepository.findByTaskId(taskId)
+                .flatMap(existing -> Mono.<Task>error(new DuplicateTaskException(taskId)))
+                .switchIfEmpty(
+                        Mono.defer(() -> {
+                            Task task = taskMapper.toEntity(createTaskRequest);
+                            task.setTaskId(taskId);
+                            task.setStatus(TaskStatus.PENDING);
+                            return taskRepository.save(task);
+                        })
+                )
                 .map(taskMapper::toDto);
     }
 
@@ -66,9 +73,9 @@ public class TaskServiceImpl implements TaskService {
                 .map(taskMapper::toDto);
     }
 
-    @Override
-    public Mono<Boolean> existsTaskByTaskId(String taskId) {
-        return taskRepository.findByTaskId(taskId)
-                .hasElement();
-    }
+//    @Override
+//    public Mono<Boolean> existsTaskByTaskId(String taskId) {
+//        return taskRepository.findByTaskId(taskId)
+//                .hasElement();
+//    }
 }
