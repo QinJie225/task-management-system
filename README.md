@@ -239,7 +239,6 @@ src/main/java/org/example/internshipassignmentkafka/
 │   ├── ApiErrorResponse.java                      # Standardized error response body
 │   ├── FieldErrorDto.java                         # Per-field validation error detail
 │   ├── GlobalExceptionHandler.java                # Centralized exception -> HTTP mapping
-│   ├── DuplicateTaskException.java                # Thrown on duplicate taskId in consumer
 │   ├── EmptyUpdateRequestException.java           # Thrown when PATCH body has no fields
 │   ├── KafkaConsumeFailedException.java           # Wraps unexpected consumer errors
 │   ├── KafkaPublishFailedException.java           # Wraps unexpected producer errors
