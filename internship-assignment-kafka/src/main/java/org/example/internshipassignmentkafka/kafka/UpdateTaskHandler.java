@@ -33,18 +33,4 @@ public class UpdateTaskHandler implements TaskEventHandler {
                                             "TASK_UPDATED", payload.taskId(), ex.getMessage());
                                 }));
     }
-
-//    @Override
-//    public Mono<Void> handle(TaskEvent event) {
-//        TaskUpdatedPayload payload = objectMapper.convertValue(
-//                event.getPayload(), TaskUpdatedPayload.class);
-//
-//        return taskService.updateTask(payload.taskId(), payload.request())
-//                .then(webhookService.sendCallback("TASK_UPDATED", payload.taskId()))
-//                .onErrorResume(RuntimeException.class, ex -> {
-//                    log.warn(ex.getMessage());
-//                    return webhookService.sendFailureCallback(
-//                            "TASK_UPDATED", payload.taskId(), ex.getMessage());
-//                });
-//    }
 }

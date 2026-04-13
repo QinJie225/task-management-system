@@ -33,19 +33,4 @@ public class CreateTaskHandler implements TaskEventHandler {
                                             "TASK_CREATED", payload.taskId(), ex.getMessage());
                                 }));
     }
-
-
-//    @Override
-//    public Mono<Void> handle(TaskEvent event) {
-//        CreateTaskPayload payload = objectMapper.convertValue(
-//                event.getPayload(), CreateTaskPayload.class);
-//
-//        return taskService.createTask(payload.request(), payload.taskId())
-//                .then(webhookService.sendCallback("TASK_CREATED", payload.taskId()))
-//                .onErrorResume(RuntimeException.class, ex -> {
-//                    log.warn(ex.getMessage());
-//                    return webhookService.sendFailureCallback(
-//                            "TASK_CREATED", payload.taskId(), ex.getMessage());
-//                });
-//    }
 }

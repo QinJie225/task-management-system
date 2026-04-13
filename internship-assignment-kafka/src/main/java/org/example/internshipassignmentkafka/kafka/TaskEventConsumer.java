@@ -22,7 +22,6 @@ public class TaskEventConsumer {
     public void consume(TaskEvent event, Consumer<String, TaskEvent> consumer) {
         log.info("Received Kafka Event: {}", event.getEventType());
 
-        //
         List<String> errors = validator.validate(event);
         if (!errors.isEmpty()) {
             log.warn("Invalid event received, routing to dead letter — reasons: {}", errors);
@@ -37,7 +36,6 @@ public class TaskEventConsumer {
                     .block();
             return;
         }
-        //
 
         registry.findEventType(event.getEventType())
                 .map(handler -> handler.handle(event))
@@ -69,7 +67,7 @@ public class TaskEventConsumer {
                                         log.info("Offset committed after dead letter routing");
                                     }
                                 }))
-                ) //
+                )
                 .block();
     }
 }
