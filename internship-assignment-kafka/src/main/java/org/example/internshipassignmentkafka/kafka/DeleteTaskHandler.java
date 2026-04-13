@@ -33,16 +33,4 @@ public class DeleteTaskHandler implements TaskEventHandler {
                                             "TASK_DELETED", taskId, ex.getMessage());
                                 }));
     }
-//    @Override
-//    public Mono<Void> handle(TaskEvent event) {
-//        String taskId = objectMapper.convertValue(event.getPayload(), String.class);
-//
-//        return taskService.deleteTask(taskId)
-//                .then(webhookService.sendCallback("TASK_DELETED", taskId))
-//                .onErrorResume(RuntimeException.class, ex -> {
-//                    log.warn(ex.getMessage());
-//                    return webhookService.sendFailureCallback(
-//                            "TASK_DELETED", taskId, ex.getMessage());
-//                });
-//    }
 }
