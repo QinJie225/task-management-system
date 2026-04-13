@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["taskId", "request"],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "pattern": "^TASK-\\d+$"
+    },
+    "request": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "title": {
+          "type": ["string", "null"],
+          "minLength": 3,
+          "maxLength": 35
+        },
+        "description": {
+          "type": ["string", "null"],
+          "minLength": 3,
+          "maxLength": 100
+        },
+        "status": {
+          "type": ["string", "null"],
+          "enum": ["PENDING", "IN_PROGRESS", "COMPLETED", null]
+        },
+        "priority": {
+          "type": ["string", "null"],
+          "enum": ["LOW", "MEDIUM", "HIGH", null]
+        },
+        "dueDate": {
+          "type": ["string", "null"],
+          "format": "date"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

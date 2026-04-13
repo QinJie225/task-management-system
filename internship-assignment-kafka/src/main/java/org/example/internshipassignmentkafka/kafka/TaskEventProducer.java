@@ -9,6 +9,7 @@ import org.example.internshipassignmentkafka.service.SequenceGeneratorService;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 
@@ -19,28 +20,31 @@ public class TaskEventProducer {
 
     private final KafkaTemplate<String, TaskEvent> kafkaTemplate;
     private final SequenceGeneratorService sequenceGeneratorService;
+    private final ObjectMapper objectMapper;
 
     private static final String TOPIC = "task-events";
 
     public Mono<Void> publishCreateEvent(CreateTaskRequest request) {
         return sequenceGeneratorService.generateSequence("task_sequence")
                 .map(nextId -> String.format("TASK-%03d", nextId))
-                .flatMap(taskId -> {
-                    CreateTaskPayload payload = new CreateTaskPayload(taskId, request);
-                    TaskEvent event = new TaskEvent("TASK_CREATED", LocalDateTime.now(), payload);
-                    return send(taskId, event);
-                });
+                .flatMap(taskId ->
+                        buildEvent("TASK_CREATED", taskId,
+                                new CreateTaskPayload(taskId, request)));
     }
 
     public Mono<Void> publishUpdateEvent(String taskId, UpdateTaskRequest request) {
-        TaskUpdatedPayload payload = new TaskUpdatedPayload(taskId, request);
-        TaskEvent event = new TaskEvent("TASK_UPDATED", LocalDateTime.now(), payload);
-        return send(taskId, event);
+        return buildEvent("TASK_UPDATED", taskId,
+                new TaskUpdatedPayload(taskId, request));
     }
 
     public Mono<Void> publishDeleteEvent(String taskId) {
-        TaskEvent event = new TaskEvent("TASK_DELETED", LocalDateTime.now(), taskId);
-        return send(taskId, event);
+        return buildEvent("TASK_DELETED", taskId, taskId);
+    }
+
+    private Mono<Void> buildEvent(String eventType, String key, Object payload) {
+        return Mono.fromCallable(() -> objectMapper.writeValueAsString(payload))
+                .map(json -> new TaskEvent(eventType, LocalDateTime.now(), json))
+                .flatMap(event -> send(key, event));
     }
 
     private Mono<Void> send(String key, TaskEvent event) {
@@ -54,5 +58,9 @@ public class TaskEventProducer {
                         event.getEventType(), ex.getMessage(), ex))
                 .onErrorMap(ex -> new KafkaPublishFailedException(event.getEventType(), key, ex))
                 .then();
+    }
+
+    public Mono<Void> publishRawEvent(TaskEvent event) {
+        return send(event.getEventType(), event);
     }
 }

@@ -8,7 +8,9 @@ import org.example.internshipassignmentkafka.dtos.TaskResponse;
 import org.example.internshipassignmentkafka.dtos.UpdateTaskRequest;
 import org.example.internshipassignmentkafka.enums.TaskStatus;
 import org.example.internshipassignmentkafka.exception.EmptyUpdateRequestException;
+import org.example.internshipassignmentkafka.kafka.TaskEvent;
 import org.example.internshipassignmentkafka.kafka.TaskEventProducer;
+import org.example.internshipassignmentkafka.service.KafkaClientService;
 import org.example.internshipassignmentkafka.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,20 +19,19 @@ import reactor.core.publisher.Mono;
 
 
 @Slf4j
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
 
-    private final TaskEventProducer taskEventProducer;
+    private final KafkaClientService kafkaClientService;
     private final TaskService taskService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Mono<Void> createTask(@Valid @RequestBody CreateTaskRequest createTaskRequest) {
-        return Mono.defer(() -> taskEventProducer.publishCreateEvent(createTaskRequest))
-                .doOnSuccess(v -> log.info("Published TASK_CREATED event for title={}", createTaskRequest.title()))
-                .then();
+        return kafkaClientService.createTask(createTaskRequest);
     }
 
     @PatchMapping("/{taskId}")
@@ -48,11 +49,7 @@ public class TaskController {
             return Mono.error(new EmptyUpdateRequestException());
         }
 
-        return Mono.defer(() ->
-                        taskEventProducer.publishUpdateEvent(taskId, updateTaskRequest)
-                )
-                .doOnSuccess(v -> log.info("Published TASK_UPDATED event for taskId={}", taskId))
-                .then();
+        return kafkaClientService.updateTask(taskId, updateTaskRequest);
     }
 
     @GetMapping
@@ -71,8 +68,15 @@ public class TaskController {
     @DeleteMapping("/{taskId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Mono<Void> deleteTask(@PathVariable String taskId) {
-        return Mono.defer(() -> taskEventProducer.publishDeleteEvent(taskId))
-                .doOnSuccess(v -> log.info("Published TASK_DELETED event for taskId={}", taskId))
-                .then();
+        return kafkaClientService.deleteTask(taskId);
+    }
+
+    // Testing Purpose
+    private final TaskEventProducer taskEventProducer;
+
+    @PostMapping("/test/publish-raw")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Mono<Void> publishRaw(@RequestBody TaskEvent event) {
+        return taskEventProducer.publishRawEvent(event);
     }
 }
