@@ -14,7 +14,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-04-28\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -37,7 +37,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-03-22\"\r\n}",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-04-26\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -83,7 +83,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"MEDIUM HIGH\",\r\n  \"dueDate\": \"2026-03-22\"\r\n}",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"MEDIUM HIGH\",\r\n  \"dueDate\": \"2026-04-28\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -106,7 +106,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"priority\": \"MEDIUM\",\r\n  \"dueDate\": \"2026-03-22\"\r\n}",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"priority\": \"MEDIUM\",\r\n  \"dueDate\": \"2026-04-22\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -129,7 +129,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"title\": \"Implement the producer and consumer logic for the internship task\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-03-22\"\r\n}",
+          "raw": "{\r\n  \"title\": \"Implement the producer and consumer logic for the internship task\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-04-30\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -147,16 +147,9 @@
     },
     {
       "name": "GET All Tasks",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
       "request": {
         "method": "GET",
         "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}"
-        },
         "url": {
           "raw": "{{baseUri}}{{taskRoute}}",
           "host": [
@@ -168,16 +161,9 @@
     },
     {
       "name": "GET All Tasks Copy with PENDING Status",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
       "request": {
         "method": "GET",
         "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}"
-        },
         "url": {
           "raw": "{{baseUri}}{{taskRoute}}?status=PENDING",
           "host": [
@@ -238,23 +224,6 @@
       "response": []
     },
     {
-      "name": "DELETE Task",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
-          "host": [
-            "{{baseUri}}{{taskRoute}}"
-          ],
-          "path": [
-            "{{taskId}}"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
       "name": "PATCH Update Task Status",
       "request": {
         "method": "PATCH",
@@ -287,7 +256,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"dueDate\": \"2026-03-30\"\r\n}",
+          "raw": "{\r\n    \"dueDate\": \"2026-04-30\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -313,7 +282,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"dueDate\": \"2026-03-14\"\r\n}",
+          "raw": "{\r\n    \"dueDate\": \"2026-03-30\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -333,7 +302,7 @@
       "response": []
     },
     {
-      "name": "PATCH Update Task Status on Task-003 (Not Found)",
+      "name": "PATCH Update Task Status on Task-004 (Not Found)",
       "request": {
         "method": "PATCH",
         "header": [],
@@ -425,6 +394,63 @@
             }
           }
         },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task 3",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-04-26\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE Task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE Task with NOT FOUND Task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
         "url": {
           "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
           "host": [

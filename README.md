@@ -1,24 +1,41 @@
 # Java Intern Assignment - Task Management System with Kafka
 
-A RESTful Task Management System built with Spring Boot, Apache Kafka, and MongoDB, demonstrating full CRUD operations with event-driven messaging via Kafka and data persistence via MongoDB.
-## Table of Contents
+A reactive RESTful Task Management System built with Spring Boot WebFlux, Apache Kafka, and MongoDB. It demonstrates full CRUD operations with an event-driven, asynchronous architecture - the API publishes Kafka events, which a consumer processes to persist data and notify downstream systems via webhooks.
 
+## Table of Contents
+- [Architecture Overview](#architecture-overview)
 - [Installation](#installation)
 - [Usage Example](#usage-example)
 - [API Endpoints](#api-endpoints)
 - [Features](#features)
 - [Kafka Integration](#kafka-integration)
+- [Webhook Integration](#webhook-integration)
 - [Exception Handling](#exception-handling)
 - [Business Rules & Assumptions](#business-rules--assumptions)
 - [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
 
+## Architecture Overview
+This application applies Event-Driven Architecture and CQRS pattern. Controllers immediately publish a Kafka event. The Kafka consumer then handles the actual database operation and fires a webhook callback on success or failure.
+   ```
+   Controller (Send API POST/PATCH/DELETE) → TaskEventProducer → Kafka Broker (task_events topic) → TaskEventConsumer → Service(Saving to MongoDB) 
+                                                                                                          ↑
+                                                                                                      WebClient
+                                                                     
+   ```
+
 ## Installation
+### Prerequisites
+- Java 21
+- Maven 3.9+
+- MongoDB (default: localhost:27017)
+- Apache Kafka (default: localhost:9092) with Zookeeper
 
+### Steps
 1. Clone the repository
-
    ```bash
    git clone https://github.com/your-username/internship-assignment-kafka.git
+   cd internship-assignment-kafka
    ```
 
 2. Open the project in IntelliJ IDEA
@@ -27,33 +44,21 @@ A RESTful Task Management System built with Spring Boot, Apache Kafka, and Mongo
 
 4. Start a MongoDB instance (default connection is expected on `localhost:27017`)
 
-5. Start Zookeeper in command prompt (Run as Administrator)
-
-```bash
-C:\kafka\kafka_2.12-3.5.2\bin\windows\zookeeper-server-start.bat C:\kafka\kafka_2.12-3.5.2\config\zookeeper.properties
-```
-
-6. Start Apache Kafka in Command Prompt (Run as Administrator). The default broker connection is expected on `localhost:9092`.
-
-```bash
-C:\kafka\kafka_2.12-3.5.2\bin\windows\kafka-server-start.bat C:\kafka\kafka_2.12-3.5.2\config\server.properties
-```
-
-7. Configure database and Kafka by editing `src/main/resources/application.properties` 
+5. Configure database and Kafka by editing `src/main/resources/application-docker.properties` 
 
    ```properties
    spring.application.name=internship-assignment-kafka
    
-   spring.mongodb.host=localhost
-   spring.mongodb.port=27017
-   spring.mongodb.database=<database>
+   # MongoDB
+   spring.mongodb.uri=mongodb://mongo:27017/TaskManagementSystem
    
    # Kafka Broker
-   spring.kafka.bootstrap-servers=localhost:9092
+   spring.kafka.bootstrap-servers=kafka:9092
    
    # Producer config
    spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
    spring.kafka.producer.value-serializer=org.springframework.kafka.support.serializer.JsonSerializer
+   spring.kafka.producer.properties.spring.json.add.type.headers=false
    
    # Consumer config
    spring.kafka.consumer.group-id=task-group
@@ -61,168 +66,230 @@ C:\kafka\kafka_2.12-3.5.2\bin\windows\kafka-server-start.bat C:\kafka\kafka_2.12
    spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer
    spring.kafka.consumer.properties.spring.json.trusted.packages=*
    spring.kafka.consumer.properties.spring.json.value.default.type=org.example.internshipassignmentkafka.kafka.TaskEvent
-   spring.kafka.producer.properties.spring.json.add.type.headers=false
+   spring.kafka.consumer.properties.spring.json.use.type.headers=false
+   
+   logging.level.org.apache.kafka.clients.consumer.internals.ConsumerCoordinator=WARN
+   logging.level.org.apache.kafka.clients.consumer.internals.ClassicKafkaConsumer=WARN
+   logging.level.org.apache.kafka.clients.NetworkClient=WARN
+   logging.level.org.apache.kafka.clients.Metadata=WARN
    ```
-8. Run the application by clicking the **Run** button on `InternshipAssignmentKafkaApplication.java`
+6. Configure Webhook Tester by editing `src/main/resources/application.properties`
+   ```properties
+   webhook.callback-url=https://webhooktest.net/webhook
+   webhook.callback-path=/{bucketID}
+   ```
 
 ## Usage Example
-1. Run `src/main/java/org/example/internshipassignmentkafka/InternshipAssignmentKafkaApplication.java` to start the application
-2. Test the API endpoints using Postman
-3. Monitor Kafka events in the application logs displayed in the terminal or command prompt (Run as Administrator)
+1. Running with Docker
 
-```bash
-cd C:\kafka\kafka_2.12-3.5.2
-bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic task-events --from-beginning
-````
+   The project includes a docker-compose.yml that starts MongoDB, Zookeeper, Kafka, and the application together
+   ```bash
+   docker compose up --build
+   ```
+   To stop and remove all containers:
+   ```bash
+   docker compose down
+   ```
+2. Test the API endpoints using Postman
+3. Monitor Kafka events in real time
+   ```bash
+   docker exec -it kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic task-events --from-beginning
+   ````
+4. Monitor Spring Boot application logging in real time
+   ```bash
+   docker compose logs -f app
+   ````
+5. Watch WebHook Tester web page (Reference: https://webhooktest.net/bucket/019d27dc-df0f-7124-afd4-befd21eb209c)
 
 ## API Endpoints
 ### Tasks
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/tasks` | Create a new task |
-| `GET` | `/api/tasks` | Get all tasks (optionally filtered by status) |
-| `GET` | `/api/tasks/{taskId}` | Get a specific task by ID |
-| `PATCH` | `/api/tasks/{taskId}` | Update a task |
-| `DELETE` | `/api/tasks/{taskId}` | Delete a task |
+All write operations return `202 Accepted` immediately 
 
+| Method   | Endpoint              | Description                              | Response          |
+|----------|-----------------------|------------------------------------------|-------------------|
+| `POST`   | `/api/tasks`          | Publish a create event for a new task    | `202 Accepted`    |
+| `GET`    | `/api/tasks`          | Get all tasks (optionally filter by status) | `200 OK`       |
+| `GET`    | `/api/tasks/{taskId}` | Get a specific task by ID                | `200 OK`          |
+| `PATCH`  | `/api/tasks/{taskId}` | Publish an update event for a task       | `202 Accepted`    |
+| `DELETE` | `/api/tasks/{taskId}` | Publish a delete event for a task        | `202 Accepted`    |
 #### Query Parameters
 - **status** (optional): Filter tasks by status (`PENDING`, `IN_PROGRESS`, `COMPLETED`)
 
 ## Features
 
 ### Task Management
-- Create, read, update, and delete tasks
-- Each task has a unique `taskId` and MongoDB `id`
+- Full CRUD with a reactive, non-blocking stack (Spring WebFlux + Reactive MongoDB)
+- Each task has a unique `taskId` (application-generated) and a MongoDB `_id`
 - Tasks include title, description, priority, due date, and status
-- Automatic timestamp tracking for creation and last modification
+- Automatic `createdAt` and `updatedAt` timestamp tracking
 
 ### Task Properties
-- **Title**: 3-35 characters, required
-- **Description**: 3-100 characters, required  
-- **Priority**: LOW, MEDIUM, or HIGH
-- **Status**: PENDING, IN_PROGRESS, or COMPLETED
-- **Due Date**: Required date field
-- **Auto-generated fields**: taskId, createdAt, updatedAt
+| Field         | Rules                                   |
+|---------------|-----------------------------------------|
+| `taskId`      | Unique application-generated identifier |
+| `title`       | Required, 3–35 characters               |
+| `description` | Required, 3–100 characters              |
+| `priority`    | Required - `LOW`, `MEDIUM`, `HIGH`      |
+| `status`      | `PENDING` on creation; updatable        |
+| `dueDate`     | Required, present or future date        |
+| `createdAt`   | Set on creation                         |
+| `updatedAt`   | Updated on every modification           |
 
 ### Validation
-- All request fields are validated using Jakarta Bean Validation
-- Invalid requests return `400 Bad Request` with field-level error details
-- Custom validation messages centralized in `ValidationMessages` utility class
+- Enforced via Jakarta Bean Validation on all request DTOs
+- `@NotBlank`, `@Size`, `@NotNull`, `@FutureOrPresent` on create requests
+- `@Pattern` + `@Size` on optional update fields (allows null but rejects blank strings)
+- All validation messages are centralized in `ValidationMessages`
 
 ## Kafka Integration
 
-### Event Publishing
-The system publishes task events to Kafka when tasks are created or updated:
+### How It Works
 
-#### TaskEvent Structure
+1. The controller calls a `TaskEventProducer` method, which wraps the request in a `TaskEvent` and sends it to the `task-events` topic.
+2. The `TaskEventConsumer` picks up the event and routes it to the appropriate `TaskService` method.
+3. After the database operation, a webhook callback is fired.
+
+### Topic
+
+| Topic          | Partitions | Replicas |
+|----------------|-----------|---------|
+| `task-events`  | 3         | 1       |
+
+### TaskEvent Structure
+
 ```java
 public class TaskEvent {
-    private String eventType;    // "TASK_CREATED" or "TASK_UPDATED"
-    private String taskId;       // Unique task identifier
-    private String title;        // Task title
-    private LocalDateTime timestamp; // Event timestamp
+   private String eventType;    // "TASK_CREATED", "TASK_UPDATED", or "TASK_DELETED"
+   private LocalDateTime timestamp;
+   private Object payload;      // CreateTaskPayload | TaskUpdatedPayload | String (taskId)
 }
 ```
 
-#### Kafka Configuration
-- **Topic**: Task events are published to the default topic
-- **Producer**: JSON serialization with String keys
-- **Consumer**: Configured for task-group with JSON deserialization
-- **Trusted Packages**: All packages are trusted for JSON deserialization
+### Event Payloads
 
-### Event Types
-- **TASK_CREATED**: Published when a new task is created
-- **TASK_UPDATED**: Published when an existing task is updated
-- **TASK_DELETED**: Published when an existing task is deleted
+| Event Type     | Payload Type          | Contents                            |
+|----------------|-----------------------|-------------------------------------|
+| `TASK_CREATED` | `CreateTaskPayload`   | `taskId` + `CreateTaskRequest`      |
+| `TASK_UPDATED` | `TaskUpdatedPayload`  | `taskId` + `UpdateTaskRequest`      |
+| `TASK_DELETED` | `String`              | `taskId`                            |
+
+## Webhook Integration
+
+After each Kafka event is processed, the system sends an HTTP POST callback to a configured webhook URL.
+
+### Configuration
+   ```properties
+    webhook.callback-url=https://webhooktest.net/webhook
+    webhook.callback-path=/{bucketID}
+   ```
+### Callback Payload
+   ```json
+   {
+     "eventType": "TASK_CREATED",
+     "taskId": "abc-123",
+     "status": "SUCCESS",
+     "message": "Task processed successfully",
+     "processedAt": "2025-07-01T10:30:00"
+   }
+   ```
+| Field         | Values              | Description                          |
+|---------------|---------------------|--------------------------------------|
+| `status`      | `SUCCESS`, `FAILED` | Outcome of the database operation    |
+| `message`     | String              | Success message or error description |
+| `processedAt` | LocalDateTime       | When the event was processed         |
+
+Webhook failures are logged but do not interrupt event processing - the consumer continues running.
 
 ## Exception Handling
-| Exception                           | HTTP Status | Trigger                                                   |
-|-------------------------------------|---|-----------------------------------------------------------|
-| EmptyUpdateRequestException         | `400 Bad Request` | Empty update request in PATCH request                     |
-| TaskNotFoundException               | `404 Not Found` | Task ID does not exist                                    |
-| MethodArgumentNotValidException     | `400 Bad Request` | Invalid request body fields failing validation constraints |
-| MethodArgumentTypeMismatchException | `400 Bad Request` | Invalid query or path parameter values                    |
-| General Exceptions                  | `500 Internal Server Error`|  Unexpected server-side errors |
+
+All exceptions are handled by `GlobalExceptionHandler` and return a consistent `ApiErrorResponse` body.
+
+| Exception                      | HTTP Status | Trigger                                                                 |
+|--------------------------------|-------------|-------------------------------------------------------------------------|
+| `TaskNotFoundException`        | `404`       | `taskId` does not exist in MongoDB                                      |
+| `EmptyUpdateRequestException`  | `400`       | PATCH request body has no fields set                                    |
+| `KafkaPublishFailedException`  | `500`       | Kafka event could not be published from the controller                  |
+| `WebExchangeBindException`     | `400`       | Bean validation fails on a request field (WebFlux equivalent of `MethodArgumentNotValidException`) |
+| `ServerWebInputException`      | `400`       | Malformed request body or invalid enum value in JSON (WebFlux equivalent of `HttpMessageNotReadableException`) |
 
 ## Business Rules & Assumptions
 
-### 1. Task Creation
-- Tasks must have a title (3-35 characters)
-- Tasks must have a description (3-100 characters)
-- Tasks must have a priority (LOW, MEDIUM, HIGH)
-- Tasks must have a due date
-- Tasks are created with PENDING status by default
-- A unique taskId is automatically generated for each task
-
-### 2. Task Updates
-- Only the fields provided in the request are updated
-- Task status can be changed to any valid status
-- Timestamps are automatically updated when tasks are modified
-
-### 3. Task Deletion
-- Tasks can be deleted by their taskID
-- Deletion is permanent and cannot be undone
-
-### 4. Kafka Events
-- Events are published asynchronously after database operations
-- Events contain essential task information for downstream consumers
-- Event publishing failures do not affect the main task operations
+1. **Async writes** - All create, update, and delete operations go through Kafka. The controller never writes to MongoDB directly.
+2. **Partial updates** - Only fields present in the `UpdateTaskRequest` are applied; unset fields remain unchanged.
+3. **Status defaults** - Tasks are always created with `PENDING` status regardless of any client input.
+4. **Webhook effort** - Failures in webhook delivery are logged and swallowed; they do not roll back the database operation.
+5. **Event publishing failures** - If publishing to Kafka fails, the HTTP response will propagate the error. The database is not touched until the consumer picks up the event.
 
 ## Project Structure
+
 ```
 src/main/java/org/example/internshipassignmentkafka/
+├── config/
+│   └── WebClientConfig.java                       # WebClient bean configured with webhook base URL
 ├── controller/
-│   └── TaskController.java                        # REST API endpoints for task management
+│   └── TaskController.java                        # Reactive REST endpoints (WebFlux)
 ├── dtos/
-│   ├── CreateTaskRequest.java                     # Request DTO for creating tasks
-│   ├── TaskResponse.java                          # Response DTO for task data
-│   └── UpdateTaskRequest.java                     # Request DTO for updating tasks
+│   ├── CreateTaskRequest.java                     # Create request DTO (validated record)
+│   ├── TaskResponse.java                          # Task response DTO
+│   └── UpdateTaskRequest.java                     # Partial update request DTO
 ├── enums/
-│   ├── TaskPriority.java                          # LOW, MEDIUM, HIGH priority levels
-│   └── TaskStatus.java                             # PENDING, IN_PROGRESS, COMPLETED
+│   ├── TaskPriority.java                          # LOW, MEDIUM, HIGH
+│   └── TaskStatus.java                            # PENDING, IN_PROGRESS, COMPLETED
 ├── exception/
 │   ├── ApiErrorResponse.java                      # Standardized error response body
-│   ├── FieldErrorDto.java                         # DTO for field-level validation errors
-│   ├── GlobalExceptionHandler.java                # Centralized exception handling
-│   ├── EmptyUpdateRequestException.java           # Thrown when update request contains no fields
-│   └── TaskNotFoundException.java                 # Thrown when a task cannot be found
+│   ├── FieldErrorDto.java                         # Per-field validation error detail
+│   ├── GlobalExceptionHandler.java                # Centralized exception -> HTTP mapping
+│   ├── EmptyUpdateRequestException.java           # Thrown when PATCH body has no fields
+│   ├── KafkaConsumeFailedException.java           # Wraps unexpected consumer errors
+│   ├── KafkaPublishFailedException.java           # Wraps unexpected producer errors
+│   └── TaskNotFoundException.java                 # Thrown when taskId is not found
 ├── kafka/
-│   ├── KafkaConfig.java                           # Kafka producer/consumer configuration
-│   ├── TaskEvent.java                             # Event model for Kafka messages
-│   ├── TaskEventConsumer.java                     # Kafka event consumer
-│   └── TaskEventProducer.java                     # Kafka event producer
+│   ├── KafkaConfig.java                           # Topic and error handler beans
+│   ├── TaskEvent.java                             # Kafka message envelope
+│   ├── TaskEventConsumer.java                     # Listener - routes events to service + webhook
+│   ├── TaskEventProducer.java                     # Publishes events to task-events topic
+│   ├── CreateTaskPayload.java                     # Payload for TASK_CREATED events
+│   ├── TaskUpdatedPayload.java                    # Payload for TASK_UPDATED events
+│   ├── WebhookPayload.java                        # Outbound webhook callback body
+│   └── WebhookService.java                        # Sends success/failure HTTP callbacks
 ├── mapper/
-│   └── TaskMapper.java                           # Maps Task entity ↔ DTO
+│   └── TaskMapper.java                            # MapStruct: entity <-> DTO, partial update
 ├── model/
 │   ├── DatabaseSequence.java                      # MongoDB sequence generator
-│   └── Task.java                                   # MongoDB document for tasks
+│   └── Task.java                                  # MongoDB document
 ├── repository/
-│   └── TaskRepository.java                        # MongoDB repository for tasks
+│   └── TaskRepository.java                        # Reactive MongoDB repository
 ├── service/
-│   ├── TaskService.java                           # Task service interface
+│   ├── TaskService.java                           # Service interface
 │   └── impl/
-│       └── TaskServiceImpl.java                   # Task business logic implementation
+│       └── TaskServiceImpl.java                   # Business logic (reactive)
 └── utility/
-    └── ValidationMessages.java                    # Centralized validation message constants
-
-InternshipAssignmentKafkaApplication.java           # Spring Boot application entry point
+    └── ValidationMessages.java                    # Validation message constants
+ 
+InternshipAssignmentKafkaApplication.java          # Spring Boot entry point
 ```
 
 ## Tech Stack
 ### Core Technologies
 - Java 17
 - Spring Boot 4.0.3
+- Spring Webflux
 - Spring Data MongoDB
-- Apache Kafka 2.12-3.5.2
-- MongoDB
+- Zookeeper (Image: confluentinc/cp-zookeeper:7.6.0)
+- Kafka (Image: confluentinc/cp-kafka:7.6.0)
+- MongoDB (Image: mongo:7.0)
 
 ### Libraries & Tools
 - Lombok
 - MapStruct 1.5.5
 - Jakarta Bean Validation
-- Jackson
+- Jackson Databind
 - Maven
 
 ### Development Tools
 - IntelliJ IDEA
 - Postman
+- Docker/Docker Compose
+- MongoDB Compass
+- Rancher Desktop
+- Webhook Tester

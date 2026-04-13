@@ -1,30 +1,30 @@
 package org.example.internshipassignmentkafka.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.internshipassignmentkafka.model.DatabaseSequence;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Service
+@RequiredArgsConstructor
 public class SequenceGeneratorService {
 
-    @Autowired
-    private MongoOperations mongoOperations;
+    private final ReactiveMongoOperations reactiveMongoOperations;
 
-    public long generateSequence(String seqName) {
-        DatabaseSequence counter = mongoOperations.findAndModify(
-                query(where("id").is(seqName)),
-                new Update().inc("seq", 1),
-                options().returnNew(true).upsert(true),
-                DatabaseSequence.class
-        );
-        return !Objects.isNull(counter) ? counter.getSeq() : 1;
+    public Mono<Long> generateSequence(String seqName) {
+        return reactiveMongoOperations.findAndModify(
+                        query(where("_id").is(seqName)),
+                        new Update().inc("seq", 1),
+                        FindAndModifyOptions.options().returnNew(true).upsert(true),
+                        DatabaseSequence.class
+                )
+                .map(DatabaseSequence::getSeq)
+                .defaultIfEmpty(1L);
     }
 }
