@@ -128,7 +128,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public Mono<ResponseEntity<ApiErrorResponse>> handleForbidden(
             AccessDeniedException ex,
-            ServerHttpRequest request   // ← WebFlux, not HttpServletRequest
+            ServerHttpRequest request
     ) {
         log.warn("Access denied for path {}: {}", request.getPath().value(), ex.getMessage());
         return Mono.just(ResponseEntity
