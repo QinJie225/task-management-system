@@ -31,4 +31,6 @@ public class Task {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
+    private String createdBy;
+    private String updatedBy;
 }

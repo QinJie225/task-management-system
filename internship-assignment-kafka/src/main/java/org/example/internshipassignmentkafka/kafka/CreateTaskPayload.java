@@ -4,5 +4,6 @@ import org.example.internshipassignmentkafka.dtos.CreateTaskRequest;
 
 public record CreateTaskPayload(
         String taskId,
-        CreateTaskRequest request
+        CreateTaskRequest request,
+        String actorUsername
 ) { }

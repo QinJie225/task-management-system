@@ -22,7 +22,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskMapper taskMapper;
 
     @Override
-    public Mono<TaskResponse> createTask(CreateTaskRequest createTaskRequest, String taskId) {
+    public Mono<TaskResponse> createTask(CreateTaskRequest createTaskRequest, String taskId, String actorUsername) {
         return taskRepository.findByTaskId(taskId)
                 .flatMap(existing -> Mono.<Task>error(new DuplicateTaskException(taskId)))
                 .switchIfEmpty(
@@ -30,6 +30,8 @@ public class TaskServiceImpl implements TaskService {
                             Task task = taskMapper.toEntity(createTaskRequest);
                             task.setTaskId(taskId);
                             task.setStatus(TaskStatus.PENDING);
+                            task.setCreatedBy(actorUsername);
+                            task.setUpdatedBy(actorUsername);
                             return taskRepository.save(task);
                         })
                 )
@@ -63,11 +65,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Mono<TaskResponse> updateTask(String taskId, UpdateTaskRequest request) {
+    public Mono<TaskResponse> updateTask(String taskId, UpdateTaskRequest request, String actorUsername) {
         return taskRepository.findByTaskId(taskId)
                 .switchIfEmpty(Mono.error(new TaskNotFoundException(taskId)))
                 .flatMap(task -> {
                     taskMapper.updateTask(request, task);
+                    task.setUpdatedBy(actorUsername);
                     return taskRepository.save(task);
                 })
                 .map(taskMapper::toDto);

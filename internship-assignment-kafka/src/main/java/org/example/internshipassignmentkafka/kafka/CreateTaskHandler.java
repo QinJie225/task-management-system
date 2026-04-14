@@ -25,7 +25,7 @@ public class CreateTaskHandler implements TaskEventHandler {
         return Mono.fromCallable(() ->
                         objectMapper.readValue(event.getPayload(), CreateTaskPayload.class))
                 .flatMap(payload ->
-                        taskService.createTask(payload.request(), payload.taskId())
+                        taskService.createTask(payload.request(), payload.taskId(), payload.actorUsername())
                                 .then(webhookService.sendCallback("TASK_CREATED", payload.taskId()))
                                 .onErrorResume(RuntimeException.class, ex -> {
                                     log.warn(ex.getMessage());
