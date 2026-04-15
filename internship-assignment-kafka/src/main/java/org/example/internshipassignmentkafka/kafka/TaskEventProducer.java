@@ -6,6 +6,7 @@ import org.example.internshipassignmentkafka.dtos.CreateTaskRequest;
 import org.example.internshipassignmentkafka.dtos.UpdateTaskRequest;
 import org.example.internshipassignmentkafka.exception.KafkaPublishFailedException;
 import org.example.internshipassignmentkafka.service.SequenceGeneratorService;
+import org.example.internshipassignmentkafka.utility.SecurityUtils;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -24,17 +25,18 @@ public class TaskEventProducer {
 
     private static final String TOPIC = "task-events";
 
-    public Mono<Void> publishCreateEvent(CreateTaskRequest request) {
+    public Mono<Void> publishCreateEvent(CreateTaskRequest request, String username) {
         return sequenceGeneratorService.generateSequence("task_sequence")
                 .map(nextId -> String.format("TASK-%03d", nextId))
                 .flatMap(taskId ->
                         buildEvent("TASK_CREATED", taskId,
-                                new CreateTaskPayload(taskId, request)));
+                                new CreateTaskPayload(taskId, request, username))
+                );
     }
 
-    public Mono<Void> publishUpdateEvent(String taskId, UpdateTaskRequest request) {
+    public Mono<Void> publishUpdateEvent(String taskId, UpdateTaskRequest request, String username) {
         return buildEvent("TASK_UPDATED", taskId,
-                new TaskUpdatedPayload(taskId, request));
+                new TaskUpdatedPayload(taskId, request, username));
     }
 
     public Mono<Void> publishDeleteEvent(String taskId) {

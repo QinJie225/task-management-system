@@ -4,5 +4,6 @@ import org.example.internshipassignmentkafka.dtos.UpdateTaskRequest;
 
 public record TaskUpdatedPayload(
         String taskId,
-        UpdateTaskRequest request
+        UpdateTaskRequest request,
+        String actorUsername
 ) { }

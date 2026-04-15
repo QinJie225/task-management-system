@@ -5,6 +5,7 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
@@ -119,6 +120,42 @@ public class GlobalExceptionHandler {
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "Internal Server Error",
                         ex.getMessage(),
+                        request.getPath().value(),
+                        null
+                )));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleForbidden(
+            AccessDeniedException ex,
+            ServerHttpRequest request
+    ) {
+        log.warn("Access denied for path {}: {}", request.getPath().value(), ex.getMessage());
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.FORBIDDEN.value(),
+                        "Forbidden",
+                        ex.getMessage(),
+                        request.getPath().value(),
+                        null
+                )));
+    }
+
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public Mono<ResponseEntity<ApiErrorResponse>> handleUnauthorized(
+            org.springframework.security.core.AuthenticationException ex,
+            ServerHttpRequest request
+    ) {
+        log.warn("Unauthorized access to {}: {}", request.getPath().value(), ex.getMessage());
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.UNAUTHORIZED.value(),
+                        "Unauthorized",
+                        "Missing or invalid authentication token",
                         request.getPath().value(),
                         null
                 )));

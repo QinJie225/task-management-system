@@ -25,7 +25,7 @@ public class UpdateTaskHandler implements TaskEventHandler {
         return Mono.fromCallable(() ->
                         objectMapper.readValue(event.getPayload(), TaskUpdatedPayload.class))
                 .flatMap(payload ->
-                        taskService.updateTask(payload.taskId(), payload.request())
+                        taskService.updateTask(payload.taskId(), payload.request(), payload.actorUsername())
                                 .then(webhookService.sendCallback("TASK_UPDATED", payload.taskId()))
                                 .onErrorResume(RuntimeException.class, ex -> {
                                     log.warn(ex.getMessage());

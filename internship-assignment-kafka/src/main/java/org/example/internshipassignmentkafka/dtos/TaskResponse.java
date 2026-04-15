@@ -15,5 +15,7 @@ public record TaskResponse(
         TaskPriority priority,
         LocalDate dueDate,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        String createdBy,
+        String updatedBy
 ) { }

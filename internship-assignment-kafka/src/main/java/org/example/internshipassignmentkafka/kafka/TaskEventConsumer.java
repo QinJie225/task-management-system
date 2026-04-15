@@ -23,51 +23,35 @@ public class TaskEventConsumer {
         log.info("Received Kafka Event: {}", event.getEventType());
 
         List<String> errors = validator.validate(event);
-        if (!errors.isEmpty()) {
-            log.warn("Invalid event received, routing to dead letter — reasons: {}", errors);
-            deadLetterProducer.send(event, errors)
-                    .doOnSuccess(v -> consumer.commitAsync((offsets, exception) -> {
-                        if (exception != null) {
-                            log.error("Commit failed after dead letter routing: {}", exception.getMessage());
-                        } else {
-                            log.info("Offset committed after dead letter routing");
-                        }
-                    }))
-                    .block();
-            return;
-        }
 
-        registry.findEventType(event.getEventType())
-                .map(handler -> handler.handle(event))
-                .orElseGet(() -> {
-                    log.warn("No handler registered for event type: {}", event.getEventType());
-                    return Mono.empty();
+        Mono<Void> pipeline = errors.isEmpty()
+                ? registry.findEventType(event.getEventType())
+                  .map(handler -> handler.handle(event))
+                  .orElseGet(() -> {
+                      log.warn("No handler registered for event type: {}", event.getEventType());
+                      return Mono.empty();
+                  })
+                  .doOnError(ex -> log.error("Failed to process {} event: {}",
+                          event.getEventType(), ex.getMessage(), ex))
+                  .onErrorMap(ex -> new KafkaConsumeFailedException(
+                          event.getEventType(), List.of(ex.getMessage()), ex))
+                : Mono.error(new KafkaConsumeFailedException(event.getEventType(), errors, null));
+
+        pipeline
+                .onErrorResume(KafkaConsumeFailedException.class, ex -> {
+                    log.warn("KafkaConsumeFailedException — reasons: {}", ex.getErrors());
+                    return deadLetterProducer.send(event, ex.getErrors());
                 })
-                .doOnSuccess(v ->
-                        consumer.commitAsync((offsets, exception) -> {
-                            if (exception != null) {
-                                log.error("Commit failed for event: {} — offsets: {} — reason: {}",
-                                        event.getEventType(), offsets, exception.getMessage());
-                            } else {
-                                log.info("Commit succeeded for event: {} — offsets: {}",
-                                        event.getEventType(), offsets);
-                            }
-                        })
-                )
-                .doOnError(ex -> log.error("Failed to process {} event: {}",
-                        event.getEventType(), ex.getMessage(), ex))
-                .onErrorMap(ex -> new KafkaConsumeFailedException(
-                        event.getEventType(), null, ex))
-                .onErrorResume(KafkaConsumeFailedException.class, ex ->
-                        deadLetterProducer.send(event, List.of(ex.getMessage()))
-                                .doOnSuccess(v -> consumer.commitAsync((offsets, exception) -> {
-                                    if (exception != null) {
-                                        log.error("Commit failed after dead letter routing: {}", exception.getMessage());
-                                    } else {
-                                        log.info("Offset committed after dead letter routing");
-                                    }
-                                }))
-                )
                 .block();
+
+        consumer.commitAsync((offsets, exception) -> {
+            if (exception != null) {
+                log.error("Commit failed for event: {} - offsets: {} - reason: {}",
+                        event.getEventType(), offsets, exception.getMessage());
+            } else {
+                log.info("Commit succeeded for event: {} - offsets: {}",
+                        event.getEventType(), offsets);
+            }
+        });
     }
 }
