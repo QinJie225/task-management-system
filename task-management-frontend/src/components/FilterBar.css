@@ -22,3 +22,16 @@
   cursor: pointer;
   background: #fff;
 }
+
+.filter-bar button {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  background: #f3f1f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

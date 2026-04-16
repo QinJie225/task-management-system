@@ -89,12 +89,7 @@ export async function createTaskAction({ request }) {
   if (!result.success) {
     return { errors: result.error.flatten().fieldErrors };
   }
-  // await taskApi.createTask({
-  //   title: data.title,
-  //   description: data.description,
-  //   priority: data.priority,
-  //   dueDate: data.dueDate,
-  // });
+
   try {
     await taskApi.createTask(result.data);
     showToast.success("Success!", "Task created successfully.");

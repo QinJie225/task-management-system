@@ -57,17 +57,3 @@
   gap: 12px;
   width: 100%;
 }
-
-.action-btn {
-  background: none;
-  border: none;
-  color: #8b949e;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s;
-}
-
-.action-btn:hover {
-  color: #070707;
-}

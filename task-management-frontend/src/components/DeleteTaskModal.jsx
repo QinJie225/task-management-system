@@ -1,6 +1,6 @@
 import { Trash2, AlertTriangle } from "lucide-react";
 import "./DeleteTaskModal.css";
-import { Link, Form, redirectDocument,} from "react-router-dom";
+import { Link, Form, redirect} from "react-router-dom";
 import { taskApi } from "../services/apiService";
 import { showToast } from "../utils/toastConfig";
 
@@ -34,10 +34,10 @@ export function DeleteTaskModal() {
 export async function deleteTaskAction({ params }) {
   try {
     await taskApi.deleteTask(params.taskId);
-    showToast.success("Deleted", "The task has been permanently removed.");
-    return redirect("/"); 
+    showToast.success("Success!", "Task deletion is being processed.");
+    return redirect("/");
   } catch (error) {
-    showToast.error("Error", "Could not delete the task. Please try again.");
-    return { error: "Delete failed" };
+    showToast.error("Error", "Failed to delete task. Please try again.");
+    return { error: "Failed to delete task" };
   }
 }

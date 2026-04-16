@@ -1,0 +1,45 @@
+.not-found-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f8fc;
+  text-align: center;
+  padding: 20px;
+}
+
+.not-found-content {
+  max-width: 500px;
+}
+
+.error-code {
+  font-size: 120px;
+  margin-bottom: 60px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.error-title {
+  font-size: 32px;
+  margin: 10px 0;
+}
+
+.error-text {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.home-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #1890ff;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.home-button:hover {
+  background: #0f75d1;
+}

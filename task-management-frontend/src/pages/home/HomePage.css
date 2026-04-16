@@ -1,16 +1,4 @@
-.app-container {
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  background-color: #ffffff;
-}
 
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
 
 .board-container {
   flex: 1;
@@ -19,177 +7,6 @@
   overflow: hidden;
 }
 
-.project-header {
-  padding: 20px 32px 16px 32px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #edf2f7;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.header-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap; 
-}
-
-.title-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.project-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0;
-}
-
-.dashboard-current-date {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: #2d3748;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  flex-wrap: wrap; 
-}
-
-.add-task-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background-color: #111827;
-  color: white;
-  border: none;
-  padding: 16px 16px;
-  border-radius: 999px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.nav-icon-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 38px;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background-color: #f1f3f5;
-  border: 1px solid transparent;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-}
-
-.nav-icon-wrapper:hover {
-  background-color: #e9ecef;
-  color: #1a202c;
-  transform: translateY(-1px);
-}
-
-.user-avatar-wrapper {
-  background-color: #f1f3f5;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  position: relative;
-}
-
-.nav-icon-wrapper svg {
-  stroke-width: 2px;
-}
-
-.user-dropdown {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  width: 240px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  padding: 8px 0;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px 16px;
-  align-items: flex-start;
-}
-
-.user-name {
-  display: block;
-  font-weight: 700;
-  color: #1a202c;
-  font-size: 16px;
-  text-align: left;
-  width: 100%;
-}
-
-.user-email {
-  font-size: 12px;
-  color: #2d3748;
-}
-
-.user-role-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 10px;
-  font-size: 11px;
-  font-weight: 600;
-
-  border-radius: 3px;
-  line-height: 1;
-
-  background-color: #e6f0ff;
-  color: #1d4ed8;
-  width: fit-content;
-}
-
-.dropdown-divider {
-  border: 0;
-  border-top: 1px solid #edf2f7;
-  margin: 8px 0;
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 16px;
-  background: none;
-  border: none;
-  font-size: 14px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.dropdown-item:hover {
-  background-color: #f7fafc;
-}
-
-.dropdown-item.logout {
-  color: #e53e3e;
-}
 
 .kanban-board {
   display: flex;
@@ -211,22 +28,20 @@
   max-width: 400px;  
 }
 
-/* Modal Backdrop */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(9, 30, 66, 0.54); /* Jira-style dimmed blue-grey */
+  background: rgba(9, 30, 66, 0.54); 
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
-  backdrop-filter: blur(2px); /* Modern touch */
+  backdrop-filter: blur(2px); 
 }
 
-/* Modal Box */
 .modal-content {
   background: white;
   width: 100%;
@@ -264,16 +79,3 @@
   background: #ebecf0;
 }
 
-.mini-avatar {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background: #bdcdee;
-  border: 1px solid #3b82f6;
-  color: #044fc8;
-  font-size: 12px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}

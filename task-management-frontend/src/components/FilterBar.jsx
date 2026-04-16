@@ -1,6 +1,9 @@
 import "./FilterBar.css";
+import { X } from "lucide-react";
 
 export function FilterBar({ filters, onChange, onClear, assignees }) {
+  const hasFilters = Object.values(filters).some((val) => val !== "");
+
   return (
     <div className="filter-bar">
       <span className="filter-label">Filter by</span>
@@ -27,8 +30,10 @@ export function FilterBar({ filters, onChange, onClear, assignees }) {
         ))}
       </select>
 
-      {(filters.priority || filters.assignee) && (
-        <button onClick={onClear}>✕ Clear filters</button>
+      {hasFilters && (
+        <button onClick={onClear} className="">
+          <X size={14}/> Clear filters
+        </button>
       )}
     </div>
   );

@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { TASK_STATUS } from "../utils/constants.js";
-import {
-  ArrowLeft,
-  Check,
-  ChevronRight,
-  PencilLine,
-  Trash2,
-  ChevronDown,
-  X,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 export function StatusDropdown({ value, onChange, disabled }) {
   const [open, setOpen] = useState(false);

@@ -1,4 +1,3 @@
-// CustomToast.jsx
 import toast from "react-hot-toast";
 import "./CustomToast.css";
 import { CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react";

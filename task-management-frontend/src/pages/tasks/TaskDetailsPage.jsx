@@ -1,10 +1,9 @@
 import { taskApi } from "../../services/apiService.js";
 import { useState, useEffect } from "react";
-import { TASK_STATUS, TASK_PRIORITY } from "../../utils/constants.js";
 import { formatDateTime } from "../../utils/formatDateTime.js";
 import { formatAvatarIcon } from "../../utils/formatAvatarIcon.js";
 import dayjs from "dayjs";
-import { Link, Outlet, redirectDocument, useFetcher } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 import "./TaskDetailsPage.css";
 import {
@@ -20,7 +19,7 @@ import { useTaskFields } from "../../hooks/useTaskFields";
 import { StatusDropdown } from "../../components/StatusDropdown.jsx";
 import { PriorityDropdown } from "../../components/PriorityDropdown.jsx";
 import { updateTaskSchema } from "../../utils/taskSchema";
-import { useAuth } from "../../hooks/useAuth";
+import { getAuthData, canUserModifyTask } from "../../utils/auth.js";
 
 export async function updateTaskAction({ request, params }) {
   const formData = await request.formData();
@@ -31,17 +30,14 @@ export async function updateTaskAction({ request, params }) {
     return { errors: result.error.flatten().fieldErrors };
   }
 
-  console.log("lululu", data);
   const updatedTask = await taskApi.updateTask(params.taskId, data);
-  // return redirectDocument(`/tasks/${params.taskId}`);
   return { success: true };
 }
 
 export function TaskDetailsPage() {
-  // const fetcher = useFetcher();
-  const { username, isAdmin } = useAuth();
+  const { username, isAdmin } = getAuthData();
   const task = useLoaderData();
-  const canModify = isAdmin || task.createdBy === username;
+  const canModify = canUserModifyTask(task);
   const {
     fields,
     setFields,
@@ -53,17 +49,6 @@ export function TaskDetailsPage() {
   } = useTaskFields(task);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  // const [fields, setFields] = useState({
-  //   title: task.title,
-  //   description: task.description,
-  //   priority: task.priority,
-  //   dueDate: task.dueDate,
-  //   status: task.status,
-  //   updatedBy: task.updatedBy ?? "U",
-  //   updatedAt: task.updatedAt,
-  //   createdAt: task.createdAt,
-  //   createdBy: task.createdBy ?? "U",
-  // });
 
   if (!fields) return <p>Loading...</p>;
 
@@ -77,14 +62,11 @@ export function TaskDetailsPage() {
   };
 
   const handleSaveTitle = () => {
-    console.log("bulu", fetcher.state);
     handleChange("title", fields.title);
   };
 
   const handleCancelTitle = () => {
-    console.log("bilibili", task.title);
     revertField("title");
-    // setFields((prev) => ({ ...prev, title: task.title }));
     setIsEditingTitle(false);
   };
 
@@ -94,26 +76,6 @@ export function TaskDetailsPage() {
       setIsEditingTitle(false);
     }
   }, [fetcher.data]);
-
-  // const saveField = async (field, value) => {
-  //   fetcher.submit(
-  //     { [field]: value },
-  //     { method: "post", action: `/tasks/${task.taskId}/update` },
-  //   );
-  // };
-
-  // const handleChange = (field, value) => {
-  //   const now = new Date().toISOString();
-  //   setFields((prev) => ({
-  //     ...prev,
-  //     [field]: value,
-  //     updatedAt: now,
-  //     updatedBy: "You",
-  //   }));
-  //   saveField(field, value);
-  //   saveField("updatedAt", now);
-  //   saveField("updatedBy", "You");
-  // };
 
   return (
     <>

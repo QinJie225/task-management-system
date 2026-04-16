@@ -1,10 +1,10 @@
 import { taskApi } from "../services/apiService.js";
 import { useState, useEffect, useRef } from "react";
 import { useFetcher } from "react-router-dom";
-import keycloak from "../keycloak.js";
-import { showToast } from "../utils/toastConfig.jsx";
+import { getAuthData } from "../utils/auth.js";
 
 export function useTaskFields(task) {
+  const { username } = getAuthData;
   const fetcher = useFetcher();
   const originalFields = useRef({
     title: task.title,
@@ -38,8 +38,7 @@ export function useTaskFields(task) {
   };
 
   const handleChange = (field, value) => {
-    const currentUsername =
-      keycloak.tokenParsed?.preferred_username || "Unknown";
+    const currentUsername = username || "User";
     setFields((prev) => ({
       ...prev,
       [field]: value,
@@ -56,10 +55,8 @@ export function useTaskFields(task) {
   useEffect(() => {
     if (fetcher.data?.errors) {
       setErrors(fetcher.data.errors);
-      // showToast.error(`Update ${fields.title}`, "Validation failed!");
     }
     if (fetcher.data?.success) {
-      // showToast.success(`Updated ${fields.title}`, "Saved successfully!");
       setErrors({});
       originalFields.current = {
         title: fields.title,
