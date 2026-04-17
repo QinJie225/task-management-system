@@ -1,5 +1,5 @@
 import { TaskCard } from "./TaskCard";
-import { TASK_STATUS } from "../utils/constants";
+import { TASK_STATUS } from "../../../utils/constants";
 import "./TaskList.css";
 
 export function TaskList({ title, tasks }) {

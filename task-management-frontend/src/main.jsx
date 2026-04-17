@@ -1,8 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
+import App from "./App";
 import "./index.css";
-import { AuthProvider } from "react-oauth2-code-pkce";   // ✅ from the library
+import { AuthProvider } from "react-oauth2-code-pkce";  
 import { authConfig } from "./auth/authConfig.js"; 
 
 createRoot(document.getElementById("root")).render(

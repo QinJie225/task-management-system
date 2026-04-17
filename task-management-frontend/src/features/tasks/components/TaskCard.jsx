@@ -1,7 +1,7 @@
 import "./TaskCard.css";
 import { Calendar, Flag } from "lucide-react";
-import { TASK_PRIORITY } from "../utils/constants";
-import { formatDate } from "../utils/formatDate";
+import { TASK_PRIORITY } from "../../../utils/constants";
+import { formatDate } from "../../../utils/formatDate";
 import { Link } from "react-router-dom";
 
 function PriorityBadge({ priority }) {

@@ -1,9 +1,8 @@
 import { Trash2, AlertTriangle } from "lucide-react";
 import "./DeleteTaskModal.css";
 import { Link, Form, redirect} from "react-router-dom";
-import { taskApi } from "../services/apiService";
-import { showToast } from "../utils/toastConfig";
-
+import { taskApi } from "../../services/apiService";
+import { showToast } from "../../utils/toastConfig.jsx";
 
 export function DeleteTaskModal() {
   return (

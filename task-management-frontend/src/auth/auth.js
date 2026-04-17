@@ -17,7 +17,6 @@ export function getAuthData() {
   const isAdmin = roles.includes("ADMIN");
   const isUser = roles.includes("USER");
 
-  console.log("bilibilibli", roles)
   return {
     name: tokenData?.name,
     username: tokenData?.preferred_username,

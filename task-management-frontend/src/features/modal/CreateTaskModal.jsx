@@ -1,9 +1,9 @@
 import { Form, redirect, Link, useActionData } from "react-router-dom";
-import { taskApi } from "../services/apiService";
+import { taskApi } from "../../services/apiService";
 import { X } from "lucide-react";
 import "./CreateTaskModal.css";
-import { createTaskSchema } from "../utils/taskSchema";
-import { showToast } from "../utils/toastConfig";
+import { createTaskSchema } from "../../utils/taskSchema";
+import { showToast } from "../../utils/toastConfig";
 
 export function CreateTaskModal() {
   const actionData = useActionData();

@@ -12,12 +12,11 @@ import {
   ChevronRight,
   PencilLine,
   Trash2,
-  ChevronDown,
   X,
 } from "lucide-react";
-import { useTaskFields } from "../../hooks/useTaskFields";
-import { StatusDropdown } from "../../components/StatusDropdown.jsx";
-import { PriorityDropdown } from "../../components/PriorityDropdown.jsx";
+import { useTaskFields } from "../../features/tasks/hooks/useTaskFields";
+import { StatusDropdown } from "../../features/tasks/components/StatusDropdown";
+import { PriorityDropdown } from "../../features/tasks/components/PriorityDropdown";
 import { updateTaskSchema } from "../../utils/taskSchema";
 import { useAuthData } from "../../hooks/useAuthData";
 

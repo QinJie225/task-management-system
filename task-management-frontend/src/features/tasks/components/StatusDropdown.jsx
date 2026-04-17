@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TASK_STATUS } from "../utils/constants.js";
+import { TASK_STATUS } from "../../../utils/constants.js";
 import { ChevronDown } from "lucide-react";
 
 export function StatusDropdown({ value, onChange, disabled }) {

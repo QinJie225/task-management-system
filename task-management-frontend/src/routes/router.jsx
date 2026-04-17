@@ -5,14 +5,14 @@ import { taskApi } from "../services/apiService";
 import {
   CreateTaskModal,
   createTaskAction,
-} from "../components/CreateTaskModal";
+} from "../features/modal/CreateTaskModal";
 import {
   DeleteTaskModal,
   deleteTaskAction,
-} from "../components/DeleteTaskModal";
+} from "../features/modal/DeleteTaskModal";
 import { updateTaskAction } from "../pages/tasks/TaskDetailsPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
-import { AppLayout } from "../layout/AppLayout";
+import { AppLayout } from "../layouts/AppLayout";
 import { requireTaskOwnership, requireAuth } from "../auth/auth";
 import ErrorPage from "../pages/ErrorPage";
 

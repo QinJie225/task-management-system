@@ -1,9 +1,9 @@
 import { useLoaderData, Outlet } from "react-router-dom";
-import { TaskList } from "../../components/TaskList";
+import { TaskList } from "../../features/tasks/components/TaskList";
 import { TASK_STATUS } from "../../utils/constants";
 import "./HomePage.css";
-import { FilterBar } from "../../components/FilterBar";
-import { useTaskFilters } from "../../hooks/useTaskFilters";
+import { FilterBar } from "../../features/tasks/components/FilterBar";
+import { useTaskFilters } from "../../features/tasks/hooks/useTaskFilters";
 
 const COLUMNS = Object.keys(TASK_STATUS).map((key) => ({
   id: key,

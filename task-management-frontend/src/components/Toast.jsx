@@ -1,8 +1,8 @@
 import toast from "react-hot-toast";
-import "./CustomToast.css";
+import "./Toast.css";
 import { CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react";
 
-export default function CustomToast({ t, type, title, message }) {
+export default function Toast({ t, type, title, message }) {
   const icons = {
     success: <CheckCircle size={20} />,
     error: <XCircle size={20} />,

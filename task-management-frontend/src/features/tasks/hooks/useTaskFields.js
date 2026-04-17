@@ -1,7 +1,7 @@
-import { taskApi } from "../services/apiService.js";
+import { taskApi } from "../../../services/apiService.js";
 import { useState, useEffect, useRef } from "react";
 import { useFetcher } from "react-router-dom";
-import { useAuthData } from "../hooks/useAuthData";
+import { useAuthData } from "../../../hooks/useAuthData.js";
 
 export function useTaskFields(task) {
   const { username } = useAuthData();
