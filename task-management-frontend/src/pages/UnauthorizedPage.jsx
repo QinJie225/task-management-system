@@ -1,8 +1,8 @@
 import "./UnauthorizedPage.css";
-import { getAuthData } from "../utils/auth";
+import { useAuthData } from "../hooks/useAuthData";
 
 export function UnauthorizedPage() {
-  const { logout } = getAuthData();
+  const { logout } = useAuthData();
   return (
     <div className="not-found-container">
       <title>401 Unauthorized</title>

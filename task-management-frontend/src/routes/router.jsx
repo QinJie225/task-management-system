@@ -13,7 +13,7 @@ import {
 import { updateTaskAction } from "../pages/tasks/TaskDetailsPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { AppLayout } from "../layout/AppLayout";
-import { requireTaskOwnership, requireAuth } from "../utils/auth";
+import { requireTaskOwnership, requireAuth } from "../auth/auth";
 import ErrorPage from "../pages/ErrorPage";
 
 export function createAppRouter() {
@@ -27,6 +27,7 @@ export function createAppRouter() {
           index: true,
           element: <HomePage />,
           loader: async () => {
+            console.log("halohalohalo");
             requireAuth();
             return await taskApi.getAllTasks();
           },

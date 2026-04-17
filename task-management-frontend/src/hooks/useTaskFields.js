@@ -1,10 +1,10 @@
 import { taskApi } from "../services/apiService.js";
 import { useState, useEffect, useRef } from "react";
 import { useFetcher } from "react-router-dom";
-import { getAuthData } from "../utils/auth.js";
+import { useAuthData } from "../hooks/useAuthData";
 
 export function useTaskFields(task) {
-  const { username } = getAuthData;
+  const { username } = useAuthData();
   const fetcher = useFetcher();
   const originalFields = useRef({
     title: task.title,

@@ -19,7 +19,7 @@ import { useTaskFields } from "../../hooks/useTaskFields";
 import { StatusDropdown } from "../../components/StatusDropdown.jsx";
 import { PriorityDropdown } from "../../components/PriorityDropdown.jsx";
 import { updateTaskSchema } from "../../utils/taskSchema";
-import { getAuthData, canUserModifyTask } from "../../utils/auth.js";
+import { useAuthData } from "../../hooks/useAuthData";
 
 export async function updateTaskAction({ request, params }) {
   const formData = await request.formData();
@@ -30,14 +30,14 @@ export async function updateTaskAction({ request, params }) {
     return { errors: result.error.flatten().fieldErrors };
   }
 
-  const updatedTask = await taskApi.updateTask(params.taskId, data);
+  await taskApi.updateTask(params.taskId, data);
   return { success: true };
 }
 
 export function TaskDetailsPage() {
-  const { username, isAdmin } = getAuthData();
+  const { canModify: canModifyTask } = useAuthData();
   const task = useLoaderData();
-  const canModify = canUserModifyTask(task);
+  const canModify = canModifyTask(task)
   const {
     fields,
     setFields,

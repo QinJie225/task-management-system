@@ -3,11 +3,11 @@ import { useNavigate, Outlet } from "react-router-dom";
 import dayjs from "dayjs";
 import { LogOut, Plus, ChevronDown } from "lucide-react";
 import { formatAvatarIcon } from "../utils/formatAvatarIcon";
-import { getAuthData } from "../utils/auth";
 import "./AppLayout.css";
+import { useAuthData } from "../hooks/useAuthData";
 
 export function AppLayout() {
-  const { name, username, email, isAdmin, logout } = getAuthData();
+  const { name, username, email, isAdmin, logout } = useAuthData();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const navigate = useNavigate();
   const openUserMenu = () => {
