@@ -10,9 +10,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((config) => {
   const raw = localStorage.getItem("ROCP_token"); 
-  console.log("mumumumumu", raw) // PKCE library's key
   if (raw) {
-    console.log("mimkmimimmiim", raw)
     const token = raw.replace(/^"|"$/g, "");
     config.headers.Authorization = `Bearer ${token}`;
   }

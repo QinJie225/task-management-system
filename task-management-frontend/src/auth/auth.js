@@ -2,9 +2,9 @@ import { taskApi } from "../services/apiService";
 
 function getParsedToken() {
   try {
-    const raw = localStorage.getItem("ROCP_token");       // library's storage key
+    const raw = localStorage.getItem("ROCP_token");    
     if (!raw) return null;
-    const [, payload] = raw.split(".");                     // decode JWT payload
+    const [, payload] = raw.split(".");          
     return JSON.parse(atob(payload));
   } catch {
     return null;
@@ -29,21 +29,15 @@ export function getAuthData() {
   };
 }
 
-
 export const requireAuth = () => {
   const { isAuthorized } = getAuthData();
-  console.log('blablabala', isAuthorized)
   if (!isAuthorized) {
     throw new Response("Unauthorized", { status: 401 });
   }
 };
 
 export const requireTaskOwnership = async ({ params }) => {
-  const { isAuthorized, username, isAdmin } = getAuthData();
-
-  if (!isAuthorized) {
-    throw new Response("Unauthorized", { status: 401 });
-  }
+  const { username, isAdmin } = getAuthData();
 
   const task = await taskApi.getTask(params.taskId);
 
