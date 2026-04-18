@@ -14,7 +14,7 @@ public record UpdateTaskRequest(
         @Size(min = 3, max = 35, message = ValidationMessages.TITLE_SIZE)
         String title,
         @Pattern(regexp = "^(?!\\s*$).+", message = ValidationMessages.DESCRIPTION_NOT_BLANK)
-        @Size(min = 3, max = 100, message = ValidationMessages.DESCRIPTION_SIZE)
+        @Size(min = 10, max = 500, message = ValidationMessages.DESCRIPTION_SIZE)
         String description,
         TaskStatus status,
         TaskPriority priority,

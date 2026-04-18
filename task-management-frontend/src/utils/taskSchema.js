@@ -5,8 +5,8 @@ export const createTaskSchema = z.object({
     .min(3, "Title must be at least 3 characters")
     .max(35, "Title must be at most 35 characters"),
   description: z.string()
-    .min(3, "Description must be at least 3 characters")
-    .max(100, "Description must be at most 100 characters"),
+    .min(10, "Description must be at least 10 characters")
+    .max(500, "Description must be at most 500 characters"),
   priority: z.enum(["LOW", "MEDIUM", "HIGH"], {
     message: "Priority is required"
   }),
@@ -24,8 +24,8 @@ export const updateTaskSchema = z.object({
     .max(35, "Title must be at most 35 characters")
     .optional(),
   description: z.string()
-    .min(3, "Description must be at least 3 characters")
-    .max(100, "Description must be at most 100 characters")
+    .min(10, "Description must be at least 10 characters")
+    .max(500, "Description must be at most 500 characters")
     .optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH"], { message: "Invalid priority" }).optional(),
   dueDate: z.string()
