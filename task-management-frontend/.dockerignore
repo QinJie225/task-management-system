@@ -1,0 +1,11 @@
+# task-management-frontend/.dockerignore
+node_modules
+build
+dist
+.git
+.gitignore
+*.md
+.env
+.env.local
+.env.development
+.env.production

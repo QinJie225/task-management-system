@@ -27,7 +27,6 @@ export function createAppRouter() {
           index: true,
           element: <HomePage />,
           loader: async () => {
-            console.log("halohalohalo");
             requireAuth();
             return await taskApi.getAllTasks();
           },
