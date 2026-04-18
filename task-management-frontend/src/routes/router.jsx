@@ -28,7 +28,7 @@ export function createAppRouter() {
           element: <HomePage />,
           loader: async () => {
             requireAuth();
-            return await taskApi.getAllTasks();
+            return null;
           },
         },
         {

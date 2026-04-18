@@ -197,3 +197,10 @@
   align-items: center;
   justify-content: center;
 }
+
+.page-body {
+  flex: 1;        
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

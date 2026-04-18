@@ -1,9 +1,8 @@
 import axiosInstance from "./axiosInstance";
 
 export const taskApi = {
-  getAllTasks: async (status = null) => {
-    const params = status ? { status } : {};
-    const { data } = await axiosInstance.get("/tasks", { params });
+  getAllTasks: async (page=0, size=10, sortBy="createdAt", direction="desc") => {
+    const { data } = await axiosInstance.get("/tasks", { params: {page, size, sortBy, direction} });
     return data;
   },
   getTask: async (taskId) => {

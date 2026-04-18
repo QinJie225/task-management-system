@@ -11,6 +11,7 @@ import org.example.internshipassignmentkafka.mapper.TaskMapper;
 import org.example.internshipassignmentkafka.model.Task;
 import org.example.internshipassignmentkafka.repository.TaskRepository;
 import org.example.internshipassignmentkafka.service.TaskService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,9 +40,16 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Flux<TaskResponse> getAllTasks() {
+    public Flux<TaskResponse> getAllTasks(Pageable pageable) {
         return taskRepository.findAll()
+                .skip(pageable.getOffset())
+                .take(pageable.getPageSize())
                 .map(taskMapper::toDto);
+    }
+
+    @Override
+    public Mono<Long> countAllTasks() {
+        return taskRepository.count();
     }
 
     @Override
