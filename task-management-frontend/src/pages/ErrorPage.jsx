@@ -1,6 +1,5 @@
 import { useRouteError, isRouteErrorResponse } from "react-router-dom";
 import { NotFoundPage } from "./NotFoundPage";
-import { UnauthorizedPage } from "./UnauthorizedPage";
 import { ForbiddenPage } from "./ForbiddenPage";
 import { SomethingWentWrongPage } from "./SomethingWentWrongPage";
 
@@ -11,8 +10,6 @@ export default function ErrorPage() {
     switch (error.status) {
       case 404:
         return <NotFoundPage />;
-      case 401:
-        return <UnauthorizedPage />;
       case 403:
         return <ForbiddenPage />;
       default:

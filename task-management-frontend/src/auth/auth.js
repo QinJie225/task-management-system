@@ -31,7 +31,7 @@ export function getAuthData() {
 export const requireAuth = () => {
   const { isAuthorized } = getAuthData();
   if (!isAuthorized) {
-    throw new Response("Unauthorized", { status: 401 });
+    throw new Response("Forbidden", { status: 403 });
   }
 };
 
