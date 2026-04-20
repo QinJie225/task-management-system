@@ -27,9 +27,13 @@ export function TaskList({ title, tasks }) {
       </div>
 
       <div className="cards-container">
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
-        ))}
+        {tasks.length > 0 ? (
+          tasks.map((task) => <TaskCard key={task.id} task={task} />)
+        ) : (
+          <div className="no-tasks-placeholder">
+            <p>No tasks in {status.label}</p>
+          </div>
+        )}
       </div>
     </div>
   );
