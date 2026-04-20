@@ -9,7 +9,9 @@ export function SomethingWentWrongPage({ error }) {
       <h1>Something Went Wrong</h1>
       <p>{error?.message ?? "An unexpected error occurred."}</p>
 
-      <button onClick={logout}>Log Out</button>
+      <button onClick={logout} className="home-button">
+        Log Out
+      </button>
     </div>
   );
 }
