@@ -1,0 +1,607 @@
+{
+  "info": {
+    "_postman_id": "162b5d28-6aa5-426c-8e1c-70becbd868bd",
+    "name": "Internship-Assignment-Kafka",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52609338",
+    "_collection_link": "https://go.postman.co/collection/52609338-162b5d28-6aa5-426c-8e1c-70becbd868bd?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "AUTH Generate JWT Token",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "password",
+              "type": "text",
+              "uuid": "08fe3a8d-44b5-49fc-aae0-59bf3cb5febb"
+            },
+            {
+              "key": "client_id",
+              "value": "task-backend",
+              "type": "text",
+              "uuid": "d5acebf6-6648-4be3-9a3f-7d310e2fa410"
+            },
+            {
+              "key": "username",
+              "value": "admin1",
+              "type": "text",
+              "uuid": "e667ad1f-2abb-45e5-8cfb-4b2b947c7c9f"
+            },
+            {
+              "key": "password",
+              "value": "admin123",
+              "type": "text",
+              "uuid": "de6426d3-2861-447e-999f-7c02ffc111cf"
+            },
+            {
+              "key": "client_secret",
+              "value": "CYTzSWYmYdqSVXoDEDwOkWmx590a81tj",
+              "type": "text",
+              "uuid": "ed6d8641-4a81-4e69-a67a-22c0e651f1f9"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8080/realms/internship-task-realm/protocol/openid-connect/token",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "realms",
+            "internship-task-realm",
+            "protocol",
+            "openid-connect",
+            "token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJHenJXcWh1MlVvY3ZfNzVtU0lzdVdiNkNfN3AxQmQxbzl3cXdudmdzUjJvIn0.eyJleHAiOjE3NzYwNzEyODgsImlhdCI6MTc3NjA3MDk4OCwianRpIjoiODQ4ZjA3ODktYmE0Ni00YTBkLThhYzktZjdmNWE5ZTM0MzFhIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9pbnRlcm5zaGlwLXRhc2stcmVhbG0iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiMzU0ZDg5MGUtZTkxYS00NTc1LTg3NGYtYjY3NTE3ZmZjZWZjIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoidGFzay1mcm9udGVuZCIsInNlc3Npb25fc3RhdGUiOiJlNjYyMjgxYy1jZDg3LTQ4ZWYtYmFlNi01OGFjYjIyZWFkMmUiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NTE3MyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLWludGVybnNoaXAtdGFzay1yZWFsbSIsIkFETUlOIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJzaWQiOiJlNjYyMjgxYy1jZDg3LTQ4ZWYtYmFlNi01OGFjYjIyZWFkMmUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJhZG1pbiBmaXJzdCBhZG1pbiBsYXN0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4xIiwiZ2l2ZW5fbmFtZSI6ImFkbWluIGZpcnN0IiwiZmFtaWx5X25hbWUiOiJhZG1pbiBsYXN0IiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20ifQ.jEl8iR5PiQInhmQBht1JF-bsUtveWw7dWFIgIEhYokM_unUJo2OxS5qzXzHzCVmr6Wgm-Q8qZcXil-3PzSh41Th3zlqoOG8cDA1gWpCo-yrZ6ndYTiVs7vXjya1vrK8QCFsf84FeL5qZ3YAcOH_GF9SMuPjZ7B59qwgrUbM9VFJRrXbwemeVnUASXihr03aeoTF1M68C09dCoRog4UAnVFi3PIltS_XH1L0hj2HzZOZTWbFz1Q6zPVKIhgx0jppJ_HeXYNJqeA9bczDOJONnAa9GTLsewNOHKyslNt_anvCpoUG1zTD3g5FjLGfkN7uTpewLTY7fU9lx4R3gKGNOKg",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-04-28\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task 2",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-04-26\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task 2 with DueDate Before Present",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-03-01\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task with Invalid Task Priority Enum",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"MEDIUM HIGH\",\r\n  \"dueDate\": \"2026-04-28\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task with Null Description",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"priority\": \"MEDIUM\",\r\n  \"dueDate\": \"2026-04-22\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task with Exceed 40 Characters Title",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Implement the producer and consumer logic for the internship task\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-04-30\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET All Tasks",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET All Tasks Copy with PENDING Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}?status=PENDING",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "PENDING"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET All Tasks with Invalid Task Status Enum",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}?status=SUBMITTED",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "SUBMITTED"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Single Task",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJHenJXcWh1MlVvY3ZfNzVtU0lzdVdiNkNfN3AxQmQxbzl3cXdudmdzUjJvIn0.eyJleHAiOjE3NzYwNzE2ODUsImlhdCI6MTc3NjA3MTM4NSwianRpIjoiZTlmNmE1MjctNDAwMy00MzZhLWJlOTUtZTFiZGNlM2MzM2UyIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9pbnRlcm5zaGlwLXRhc2stcmVhbG0iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiMzU0ZDg5MGUtZTkxYS00NTc1LTg3NGYtYjY3NTE3ZmZjZWZjIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoidGFzay1mcm9udGVuZCIsInNlc3Npb25fc3RhdGUiOiI3ZGI5ZmM3OS0xZDExLTRiNWItYjA5NC0yN2YyNTg5YzNkYWIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NTE3MyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLWludGVybnNoaXAtdGFzay1yZWFsbSIsIkFETUlOIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJzaWQiOiI3ZGI5ZmM3OS0xZDExLTRiNWItYjA5NC0yN2YyNTg5YzNkYWIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJhZG1pbiBmaXJzdCBhZG1pbiBsYXN0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4xIiwiZ2l2ZW5fbmFtZSI6ImFkbWluIGZpcnN0IiwiZmFtaWx5X25hbWUiOiJhZG1pbiBsYXN0IiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20ifQ.E9UkAlg9oNHhq4tqASGCUvwiI15bopE4BtSxRUBch9eRm1PZ_-v88MW7U3dE59eYeDnNgTlWZm9fhYnCwvnXCon_daR0SFRgu8kycCFjWCue001d22pXHyPtsQXlzjDqzPlYZCFeBYH3Lo6KATWFZO7i9qQ2RNdQc3w8xWRTAnH0vLv4VuHWaq1hbxgM-ckgZexWHCD_ZmDV2TuUea_5qE-6kWBzajTypKoI6jysndrFDdeFcbHnU_LoHHuqHKPOjyGJpEPD1d9ytfsQ1NbsPxLJC9JmtnPid94jYfhd0nEl_s5sysY1ynXCuOHY-2pQdhwz5jX3qGv7Q-qHnEaGoQ",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"COMPLETED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task-001 Due Date",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"dueDate\": \"2026-07-30\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task-001 Due Date to Yesterday",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"dueDate\": \"2026-05-30\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task Status on Task-004 (Not Found)",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"COMPLETED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET All Tasks Copy with COMPLETED Status",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Complete Kafka Assignment\",\r\n  \"description\": \"Implement the producer and consumer logic for the internship task.\",\r\n  \"priority\": \"HIGH\",\r\n  \"dueDate\": \"2026-03-20\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}?status=COMPLETED",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "COMPLETED"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task with Null RequestBody",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PATCH Update Task Status with Invalid Enum",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"SUBMITTED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Create Task 3",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Prepare SPM\",\r\n  \"description\": \"SPM Pure Science\",\r\n  \"priority\": \"LOW\",\r\n  \"dueDate\": \"2026-04-26\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE Task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE Task with NOT FOUND Task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/{{taskId}}",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "{{taskId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Test Invalid Kafka Consumer Message",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventType\": \"TASK_CREATED\",\r\n  \"timestamp\": \"2026-01-01T00:00:00\",\r\n  \"payload\": \"{\\\"taskId\\\":\\\"TASK-001\\\",\\\"request\\\":{\\\"title\\\":\\\"Fix bug\\\",\\\"description\\\":\\\"Fix login bug\\\",\\\"priority\\\":\\\"URGENT\\\",\\\"dueDate\\\":\\\"2026-12-01\\\"}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUri}}{{taskRoute}}/test/publish-raw",
+          "host": [
+            "{{baseUri}}{{taskRoute}}"
+          ],
+          "path": [
+            "test",
+            "publish-raw"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJXeTE3am43QTEySFR6U2NscHhXWlJkNkR0bmpmV2RwZWhkUERGVWl2Wm04In0.eyJleHAiOjE3NzY2NzE2MjYsImlhdCI6MTc3NjY3MTMyNiwianRpIjoiOWVlODM0OTUtMmQwZS00YmVkLWIzYmQtZDM3NGU4MWY2NzRlIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9pbnRlcm5zaGlwLXRhc2stcmVhbG0iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNTAzNzAzN2MtYjUyNS00YmQ2LWFkMjgtNmNkMzk2OWJmNWUxIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoidGFzay1iYWNrZW5kIiwic2Vzc2lvbl9zdGF0ZSI6IjI5MzZmZTQ5LWYyMjQtNDE4OS05ZTYwLWNhMjMxZmRiN2RmOCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiLyoiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwiZGVmYXVsdC1yb2xlcy1pbnRlcm5zaGlwLXRhc2stcmVhbG0iLCJBRE1JTiIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiMjkzNmZlNDktZjIyNC00MTg5LTllNjAtY2EyMzFmZGI3ZGY4IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiYWRtaW4gZmlyc3QgYWRtaW4gbGFzdCIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluMSIsImdpdmVuX25hbWUiOiJhZG1pbiBmaXJzdCIsImZhbWlseV9uYW1lIjoiYWRtaW4gbGFzdCIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIn0.h9O6rPBDXv7eLYpggR7ZKuPMUJGxdxTsgD3bonJ91J5PImCsqpx394eGuoBwaUxJaYGAimmP6s7CY6LLyPWabwssmhrOl104khwKft4NLhzf-KrOCuQo6Im3qboxleQKpLoZoJlevi9M0w92Mhbc9l9FJSuwKtnP8hkLrvhBOguHNHuVImyzUZaNr3FFXfQ3_v_FQco2OJITU0YYrQARweDmbHvpVJ6XGSFxEpghvYf856nUlZ_i9fO-QLBzLCUNJD_KTPc_xOhSEBS39F_Ne1qGaWFPmIAxVtwoSBUdreY7uplplVzjs7u_rDRdt7QMGCCTzWT6Ki2GTedVdDj5pw",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
