@@ -123,8 +123,8 @@ class TaskControllerTest {
     class GlobalSecurityTests {
 
         @Test
-        @DisplayName("No token returns 401 Unauthorized for secured endpoints")
-        void noToken_returns401() {
+        @DisplayName("Given no token, when requesting secured endpoints, then return 401 Unauthorized")
+        void givenNoToken_whenRequestingSecuredEndpoints_thenReturn401() {
             webTestClient.get().uri("/api/tasks")
                     .exchange()
                     .expectStatus().isUnauthorized();
@@ -142,8 +142,8 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("ADMIN can view all tasks")
-        void admin_canViewAllTasks() {
+        @DisplayName("Given user has ADMIN role, when viewing all tasks, then return 200 OK")
+        void givenAdminUser_whenViewingAllTasks_thenReturn200() {
             webTestClient.mutateWith(jwtFor("admin1", "ADMIN"))
                     .get().uri("/api/tasks")
                     .exchange()
@@ -151,25 +151,17 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("USER can view all tasks")
-        void user_canViewAllTasks() {
+        @DisplayName("Given user has USER role, when viewing all tasks, then return 200 OK")
+        void givenNormalUser_whenViewingAllTasks_thenReturn200() {
             webTestClient.mutateWith(jwtFor("alice", "USER"))
                     .get().uri("/api/tasks")
                     .exchange()
                     .expectStatus().isOk();
         }
 
-//        @Test
-//        @DisplayName("No token returns 401")
-//        void noToken_returns401() {
-//            webTestClient.get().uri("/api/tasks")
-//                    .exchange()
-//                    .expectStatus().isUnauthorized();
-//        }
-
         @Test
-        @DisplayName("Token with no recognised role returns 403")
-        void noRole_returns403() {
+        @DisplayName("Given token with no recognized role, when viewing all tasks, then return 403 Forbidden")
+        void givenUserWithNoRole_whenViewingAllTasks_thenReturn403() {
             webTestClient.mutateWith(jwtWithNoRole("stranger"))
                     .get().uri("/api/tasks")
                     .exchange()
@@ -182,8 +174,8 @@ class TaskControllerTest {
     class GetTaskById {
 
         @Test
-        @DisplayName("ADMIN can view any task")
-        void admin_canViewAnyTask() {
+        @DisplayName("Given user is ADMIN, when viewing any specific task, then return 200 OK")
+        void givenAdmin_whenViewingAnyTask_thenReturn200() {
             when(taskService.getTask("TASK-1001")).thenReturn(Mono.just(aliceTaskResponse));
 
             webTestClient.mutateWith(jwtFor("admin1", "ADMIN"))
@@ -193,8 +185,8 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("USER can view any task")
-        void user_canViewAnyTask() {
+        @DisplayName("Given user is normal USER, when viewing any specific task, then return 200 OK")
+        void givenUser_whenViewingAnyTask_thenReturn200() {
             when(taskService.getTask("TASK-1001")).thenReturn(Mono.just(aliceTaskResponse));
 
             webTestClient.mutateWith(jwtFor("bob", "USER"))
@@ -203,17 +195,9 @@ class TaskControllerTest {
                     .expectStatus().isOk();
         }
 
-//        @Test
-//        @DisplayName("No token returns 401")
-//        void noToken_returns401() {
-//            webTestClient.get().uri("/api/tasks/TASK-1001")
-//                    .exchange()
-//                    .expectStatus().isUnauthorized();
-//        }
-
         @Test
-        @DisplayName("Token with no recognised role returns 403")
-        void noRole_returns403() {
+        @DisplayName("Given user has no recognized role, when viewing a specific task, then return 403 Forbidden")
+        void givenNoRole_whenViewingTask_thenReturn403() {
             webTestClient.mutateWith(jwtWithNoRole("stranger"))
                     .get().uri("/api/tasks/TASK-1001")
                     .exchange()
@@ -241,8 +225,8 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("ADMIN can create a task — returns 202")
-        void admin_canCreateTask() {
+        @DisplayName("Given ADMIN role, when creating a task, then return 202 Accepted")
+        void givenAdmin_whenCreatingTask_thenReturn202() {
             webTestClient.mutateWith(jwtFor("admin1", "ADMIN"))
                     .post().uri("/api/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -252,8 +236,8 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("USER can create a task — returns 202")
-        void user_canCreateTask() {
+        @DisplayName("Given USER role, when creating a task, then return 202 Accepted")
+        void givenUser_whenCreatingTask_thenReturn202() {
             webTestClient.mutateWith(jwtFor("alice", "USER"))
                     .post().uri("/api/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -262,19 +246,9 @@ class TaskControllerTest {
                     .expectStatus().isAccepted();
         }
 
-//        @Test
-//        @DisplayName("No token returns 401")
-//        void noToken_returns401() {
-//            webTestClient.post().uri("/api/tasks")
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .bodyValue(createPayload)
-//                    .exchange()
-//                    .expectStatus().isUnauthorized();
-//        }
-
         @Test
-        @DisplayName("Token with no recognised role returns 403")
-        void noRole_returns403() {
+        @DisplayName("Given no recognized role, when creating a task, then return 403 Forbidden")
+        void givenNoRole_whenCreatingTask_thenReturn403() {
             webTestClient.mutateWith(jwtWithNoRole("stranger"))
                     .post().uri("/api/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -299,8 +273,8 @@ class TaskControllerTest {
                 """;
 
         @Test
-        @DisplayName("ADMIN can update any task — returns 202")
-        void admin_canUpdateAnyTask() {
+        @DisplayName("Given ADMIN user, when updating any task, then return 202 Accepted")
+        void givenAdmin_whenUpdatingAnyTask_thenReturn202() {
             when(kafkaClientService.updateTask(eq("TASK-1002"), any())).thenReturn(Mono.empty());
 
             webTestClient.mutateWith(jwtFor("admin1", "ADMIN"))
@@ -312,8 +286,8 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("USER can update their OWN task — returns 202")
-        void user_canUpdateOwnedTask() {
+        @DisplayName("Given task owner, when updating their own task, then return 202 Accepted")
+        void givenTaskOwner_whenUpdatingTask_thenReturn202() {
             when(kafkaClientService.updateTask(eq("TASK-1001"), any())).thenReturn(Mono.empty());
 
             webTestClient.mutateWith(jwtFor("alice", "USER"))
@@ -325,8 +299,8 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("USER cannot update someone else's task — returns 403")
-        void user_cannotUpdateUnownedTask() {
+        @DisplayName("Given normal USER, when updating another user's task, then return 403 Forbidden")
+        void givenNonOwnerUser_whenUpdatingTask_thenReturn403() {
             // Mock the service layer throwing the AccessDeniedException due to ownership mismatch
             when(kafkaClientService.updateTask(eq("TASK-1001"), any()))
                     .thenReturn(Mono.error(new AccessDeniedException("You are not allowed to modify this task")));
@@ -339,19 +313,9 @@ class TaskControllerTest {
                     .expectStatus().isForbidden();
         }
 
-//        @Test
-//        @DisplayName("No token returns 401")
-//        void noToken_returns401() {
-//            webTestClient.patch().uri("/api/tasks/TASK-1001")
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .bodyValue(updatePayload)
-//                    .exchange()
-//                    .expectStatus().isUnauthorized();
-//        }
-
         @Test
-        @DisplayName("Token with no recognised role returns 403")
-        void noRole_returns403() {
+        @DisplayName("Given no recognized role, when updating a task, then return 403 Forbidden")
+        void givenNoRole_whenUpdatingTask_thenReturn403() {
             webTestClient.mutateWith(jwtWithNoRole("stranger"))
                     .patch().uri("/api/tasks/TASK-1001")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -366,8 +330,8 @@ class TaskControllerTest {
     class DeleteTask {
 
         @Test
-        @DisplayName("ADMIN can delete any task — returns 202")
-        void admin_canDeleteTask() {
+        @DisplayName("Given ADMIN user, when deleting any task, then return 202 Accepted")
+        void givenAdmin_whenDeletingTask_thenReturn202() {
             when(kafkaClientService.deleteTask("TASK-1002")).thenReturn(Mono.empty());
 
             webTestClient.mutateWith(jwtFor("admin1", "ADMIN"))
@@ -377,8 +341,8 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("USER can delete their OWN task — returns 202")
-        void user_canDeleteOwnedTask() {
+        @DisplayName("Given task owner, when deleting their task, then return 202 Accepted")
+        void givenTaskOwner_whenDeletingTask_thenReturn202() {
             when(kafkaClientService.deleteTask("TASK-1001")).thenReturn(Mono.empty());
 
             webTestClient.mutateWith(jwtFor("alice", "USER"))
@@ -388,8 +352,8 @@ class TaskControllerTest {
         }
 
         @Test
-        @DisplayName("USER cannot delete someone else's task — returns 403")
-        void user_cannotDeleteUnownedTask() {
+        @DisplayName("Given normal USER, when deleting another user's task, then return 403 Forbidden")
+        void givenNonOwnerUser_whenDeletingTask_thenReturn403() {
             // Mock the service layer throwing the AccessDeniedException due to ownership mismatch
             when(kafkaClientService.deleteTask("TASK-1001"))
                     .thenReturn(Mono.error(new AccessDeniedException("You are not allowed to modify this task")));
@@ -400,17 +364,9 @@ class TaskControllerTest {
                     .expectStatus().isForbidden();
         }
 
-//        @Test
-//        @DisplayName("No token returns 401")
-//        void unauthenticated_returns401() {
-//            webTestClient.delete().uri("/api/tasks/TASK-1001")
-//                    .exchange()
-//                    .expectStatus().isUnauthorized();
-//        }
-
         @Test
-        @DisplayName("Token with no recognised role returns 403")
-        void noRole_returns403() {
+        @DisplayName("Given no recognized role, when deleting a task, then return 403 Forbidden")
+        void givenNoRole_whenDeletingTask_thenReturn403() {
             webTestClient.mutateWith(jwtWithNoRole("stranger"))
                     .delete().uri("/api/tasks/TASK-1001")
                     .exchange()
