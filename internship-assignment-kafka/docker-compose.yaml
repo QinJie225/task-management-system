@@ -68,6 +68,18 @@ services:
     networks:
       - app-network
 
+  frontend:
+    build:
+      context: ../task-management-frontend
+      dockerfile: Dockerfile
+    container_name: react-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
+    networks:
+      - app-network
+
   app:
     build: .
     container_name: internship-assignment-kafka

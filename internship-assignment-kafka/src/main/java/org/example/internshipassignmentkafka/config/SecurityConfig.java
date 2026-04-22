@@ -44,6 +44,27 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(customAuthenticationEntryPoint())
+                        .accessDeniedHandler((exchange, denied) -> {
+                            log.warn("Access denied to {}: {}",
+                                    exchange.getRequest().getPath().value(),
+                                    denied.getMessage());
+
+                            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                            exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+                            ApiErrorResponse errorResponse = new ApiErrorResponse(
+                                    LocalDateTime.now(),
+                                    HttpStatus.FORBIDDEN.value(),
+                                    "Forbidden",
+                                    "You do not have permission to access this resource",
+                                    exchange.getRequest().getPath().value(),
+                                    null
+                            );
+
+                            return Mono.fromCallable(() -> objectMapper.writeValueAsBytes(errorResponse))
+                                    .map(bytes -> exchange.getResponse().bufferFactory().wrap(bytes))
+                                    .flatMap(buffer -> exchange.getResponse().writeWith(Mono.just(buffer)));
+                        })
                 )
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
@@ -61,7 +82,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
