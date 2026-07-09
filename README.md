@@ -491,7 +491,7 @@ Keycloak login → PKCE redirect → token stored → useAuthReady: "ready" → 
 ![TaskDetailsPage](./Screenshot/React-Frontend-Pages/TaskDetailsPage.png)
 
 **AddNewTask Modal**
-![AddNewTaskModal](./Screenshot/React-Frontend-Pages/AddNewTask%20Modal.png)
+![AddNewTaskModal](./Screenshot/React-Frontend-Pages/AddNewTaskModal.png)
 
 
 ### Form Validation
