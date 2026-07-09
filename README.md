@@ -485,13 +485,13 @@ Keycloak login → PKCE redirect → token stored → useAuthReady: "ready" → 
 ### Key Components & Features
 
 **HomePage Dashboard**
-![HomePage](./Screenshot/React-Frontend-Pages/HomePage%20Dashboard.png)
+![HomePage](./Screenshot/README-Images/HomePage%20Dashboard.png)
 
 **Task Details Page**
-![TaskDetailsPage](./Screenshot/React-Frontend-Pages/TaskDetailsPage.png)
+![TaskDetailsPage](./Screenshot/README-Images/TaskDetailsPage.png)
 
 **AddNewTask Modal**
-![AddNewTaskModal](./Screenshot/React-Frontend-Pages/AddNewTaskModal.png)
+![AddNewTaskModal](./Screenshot/README-Images/AddNewTaskModal.png)
 
 
 ### Form Validation
